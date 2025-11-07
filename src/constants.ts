@@ -18,7 +18,7 @@
 // // polkadot的私钥
 // export const DEFAULT_POLKADOT_PRIVATE_KEY = "0x"
 
-export const DEFAULT_ASSET_HUB_PRIVATE_KEY = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451"
+
 export const DEFAULT_ASSET_HUB_WALLET_DATA_KEY = "asset_hub_polkadot/walletData"
 export const DEFAULT_ASSET_HUB_RPC_URL = "https://rpc-asset-hub-polkadot.luckyfriday.io"
 export const DEFAULT_SUBSCAN_X_API_KEY = "371616121bcc4d1b8f59d4e2072135e4"

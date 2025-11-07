@@ -19,12 +19,12 @@ import { SubstrateChain } from '../src/common/substrate-chain';
 import { SubscanApi } from '../src/common/subscan-api';
 import { SR25519AES } from '@eliza-dot-aes/sr25519-aes';
 import type { ICryptMessage } from '@eliza-dot-aes/common';
-import { DEFAULT_ASSET_HUB_RPC_URL, DEFAULT_ASSET_HUB_PRIVATE_KEY} from '../src/constants';
+import { DEFAULT_ASSET_HUB_RPC_URL} from '../src/constants';
 import { TransferDetailWithMemo } from '../src/types';
 
 describe('SubstrateChain', () => {
     const mockRpcUrl = 'https://rpc-asset-hub-polkadot.luckyfriday.io';
-    const mockPrivateKey = DEFAULT_ASSET_HUB_PRIVATE_KEY;
+    const mockPrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
     const mockNetwork = 'Polkadot Asset Hub';
     const mockApiKey = '371616121bcc4d1b8f59d4e2072135e4';
     const myAddress = '13GKHvBFjWuVjezV8cG6DMoK2FftY4awXXqKdunApnJGbvwd';
@@ -358,7 +358,7 @@ describe('SubstrateChain', () => {
     });
 
     describe('transferWithMemo', () => {
-        const alicePrivateKey = DEFAULT_ASSET_HUB_PRIVATE_KEY;
+        const alicePrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
         const bobPrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
         const subscan = "371616121bcc4d1b8f59d4e2072135e4";
         const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
