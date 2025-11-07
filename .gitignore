@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.cursorrules
+.cursor
+.vscode
+PUBLISHING.md

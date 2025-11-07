@@ -1,0 +1,33 @@
+# Source files
+src/
+test/
+*.test.ts
+*.spec.ts
+
+# Development files
+.vscode/
+.cursor/
+.cursorrules
+coverage/
+*.log
+.DS_Store
+
+# Build artifacts (will be included via files field in package.json)
+# dist/ is included, so we don't need to ignore it
+
+# Config files
+tsconfig.json
+vitest.config.ts
+.gitignore
+.npmignore
+
+# Dependencies
+node_modules/
+
+# Documentation (README.md and LICENSE are included via files field)
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+

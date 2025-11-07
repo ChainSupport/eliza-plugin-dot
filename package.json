@@ -1,0 +1,69 @@
+{
+  "name": "@chainsupport/eliza-polkadot-assethub",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "eliza",
+    "elizaos",
+    "polkadot",
+    "substrate",
+    "blockchain",
+    "plugin",
+    "asset-hub",
+    "dot",
+    "crypto",
+    "wallet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChainSupport/eliza-plugin-dot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChainSupport/eliza-plugin-dot/issues"
+  },
+  "homepage": "https://github.com/ChainSupport/eliza-plugin-dot#readme",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "coverage:watch": "vitest --coverage"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "description": "Core Polkadot Asset Hub blockchain plugin for Eliza OS that provides essential services and actions for asset operations, transfers, and encrypted messaging on the Polkadot ecosystem.",
+  "devDependencies": {
+    "@types/node": "^24.0.1",
+    "@vitest/coverage-v8": "^1.6.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^1.6.1"
+  },
+  "dependencies": {
+    "@eliza-dot-aes/common": "^1.0.7",
+    "@eliza-dot-aes/sr25519-aes": "^1.0.2",
+    "@elizaos/core": "1.0.8",
+    "@noble/curves": "^1.9.7",
+    "@noble/ed25519": "^2.3.0",
+    "@polkadot/api": "^16.2.1",
+    "@polkadot/apps-config": "^0.162.1",
+    "@polkadot/keyring": "^13.5.3",
+    "@polkadot/types": "^16.2.1",
+    "@polkadot/types-codec": "^16.4.4",
+    "@polkadot/util": "^13.5.3",
+    "@polkadot/util-crypto": "^13.5.1",
+    "@scure/sr25519": "^0.2.0",
+    "axios": "^1.11.0",
+    "ethereum-cryptography": "^3.2.0",
+    "jssha": "^3.3.1",
+    "node-cache": "^5.1.2"
+  }
+}
