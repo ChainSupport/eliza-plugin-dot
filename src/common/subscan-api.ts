@@ -15,7 +15,7 @@
  */
 
 
-import {Message, TransferDetailWithMemo, TransferDetail } from "../types/index";
+import {Message, TransferDetailWithMemo, TransferDetail } from "../types";
 import {convertJsonToEncryptedMemo, EncryptedMemo, ICryptMessage} from "@eliza-dot-aes/common"
 
 /**

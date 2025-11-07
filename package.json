@@ -65,5 +65,27 @@
     "ethereum-cryptography": "^3.2.0",
     "jssha": "^3.3.1",
     "node-cache": "^5.1.2"
-  }
+  },
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0",
+    "pluginParameters": {
+      "ASSET_HUB_PRIVATE_KEY": {
+        "type": "string",
+        "description": "The private key of the Asset Hub wallet.",
+        "required": true,
+        "sensitive": false
+      },
+      "ASSET_HUB_RPC_URL": {
+        "type": "string",
+        "description": "The RPC URL of the Asset Hub.",
+        "required": false,
+        "sensitive": false
+      },
+      "SUBSCAN_X_API_KEY": {
+        "type": "string",
+        "description": "The API key of the Subscan.", 
+        "required": false,
+        "sensitive": false
+      }
+    }}
 }
