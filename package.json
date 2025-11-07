@@ -71,13 +71,13 @@
     "pluginParameters": {
       "ASSET_HUB_PRIVATE_KEY": {
         "type": "string",
-        "description": "The private key of the Asset Hub wallet.",
+        "description": "The private key of the POLKADOT Asset Hub wallet.",
         "required": true,
         "sensitive": false
       },
       "ASSET_HUB_RPC_URL": {
         "type": "string",
-        "description": "The RPC URL of the Asset Hub.",
+        "description": "The RPC URL of the POLKADOT Asset Hub.",
         "required": false,
         "sensitive": false
       },
