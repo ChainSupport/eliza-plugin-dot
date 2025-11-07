@@ -4,3 +4,4 @@ dist/
 .cursor
 .vscode
 PUBLISHING.md
+coverage/

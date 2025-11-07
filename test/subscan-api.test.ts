@@ -95,9 +95,6 @@ describe('SubscanApi', () => {
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
             expect(result).toHaveLength(2);
-            // 这个返回时不按顺序的
-            // expect(result[0].extrinsic_index).toBe('10230245-2');
-            // expect(result[1].extrinsic_index).toBe('9602102-2');
         });
     }, {timeout: 10000});
 
@@ -106,7 +103,6 @@ describe('SubscanApi', () => {
             const mockAddress = '13GKHvBFjWuVjezV8cG6DMoK2FftY4awXXqKdunApnJGbvwd';
 
             const result = await api.addressTransferHistory(mockAddress);
-            // console.log(JSON.stringify(result));
             expect(result.length).toBeGreaterThan(0);
         });
 
