@@ -58,6 +58,7 @@ interface SendMessageContent extends Content {
  * @returns true if the content is valid, false otherwise
  */
 function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessageContent): boolean {
+    runtime.logger.info(`validateSendMessageContent: ${JSON.stringify(content)}`);
     if (content.recipient === null || content.recipient === "" || !checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return false;
