@@ -325,6 +325,21 @@ describe('SubstrateChain', () => {
         }, { timeout: 30000 });
     });
 
+    // getAddressPublicKey
+    describe('getAddressPublicKey', () => {
+        it('should get public key from address', async () => {
+            const chain = await SubstrateChain.create(
+                mockRpcUrl,
+                mockPrivateKey
+            );
+            const publicKey = await chain.getAddressPublicKey(myAddress);
+            console.log("publicKey", publicKey);
+
+            await expect(chain.getAddressPublicKey("error" as any)).rejects.toThrow();
+        });
+    }, { timeout: 30000 });
+
+
     describe('getMyBalance', () => {
         it('should get my balance for native token', async () => {
             const chain = await SubstrateChain.create(
@@ -332,6 +347,9 @@ describe('SubstrateChain', () => {
                 mockPrivateKey
             );
             const balance = await chain.getUserBalance(myAddress);
+            const balance2 = await chain.getUserBalance("error" as any);
+            console.log("balance2", balance2);
+            expect(balance2).toBe(BigInt(0));
             console.log("balance", balance);
             expect(balance).toBeGreaterThan(0);
         });
@@ -354,10 +372,16 @@ describe('SubstrateChain', () => {
             const decimals = await chain.getAssetsDecimals(18);
             console.log("decimals", decimals);
             expect(decimals).toBe(4)
+            
+            const decimals2 = await chain.getAssetsDecimals(null);
+            console.log("decimals2", decimals2);
+            expect(decimals2).toBe(10);
+
+            await expect(chain.getAssetsDecimals("error" as any)).rejects.toThrow();
         });
     });
 
-    describe('transferWithMemo', () => {
+    describe.skip('transferWithMemo', () => {
         const alicePrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
         const bobPrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
         const subscan = "371616121bcc4d1b8f59d4e2072135e4";

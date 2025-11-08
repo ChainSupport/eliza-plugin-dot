@@ -164,16 +164,9 @@ export class SubstrateChain {
      * @returns true if the address is valid, false otherwise
      */
     public validateAddress(address: string): boolean {
-        if (this.isEthereum) {
-            return false;
-        }
-        try {
-            const [isValid] = checkAddress(address, this.ss58Format);
-            return isValid
-        } catch (e) {
-            return false;
-        }
-    }
+        const [isValid] = checkAddress(address, this.ss58Format);
+        return isValid
+}
 
 
     /**
@@ -185,9 +178,6 @@ export class SubstrateChain {
      * @throws Error if the address is invalid or extraction fails
      */
     public async getAddressPublicKey(address: string): Promise<string> {
-        if (this.isEthereum) {
-            return "";
-        }
         try {
             const keyring = new Keyring({type: this.keyPairType, ss58Format: this.ss58Format});
             const keyPair = keyring.addFromAddress(address);
@@ -205,13 +195,9 @@ export class SubstrateChain {
      * @throws Error if key derivation fails
      */
     public async getMyAddress(): Promise<string> {
-        try {
-            const keyring = new Keyring({type: this.keyPairType, ss58Format: this.ss58Format});
-            const keyPair = keyring.addFromSeed(hexToU8a(this.privateKey));
-            return keyPair.address;
-        } catch (e) {
-            throw Error(`Failed to getMyAddress: ${e}`);
-        }
+        const keyring = new Keyring({type: this.keyPairType, ss58Format: this.ss58Format});
+        const keyPair = keyring.addFromSeed(hexToU8a(this.privateKey));
+        return keyPair.address;
     }
 
     /**
@@ -472,16 +458,17 @@ export class SubstrateChain {
    * @throws Error if the RPC call fails
    */
   public async getLatestBlockHeight(): Promise<number> {
-    try {
-      const blockHash = await this.api.rpc.chain.getFinalizedHead();
-      const blockHeader = await this.api.rpc.chain.getHeader(blockHash)
-      return blockHeader.number.toNumber();
-    } catch (e) {
-      throw Error(`Failed to getLatestBlockHeight: ${e}`);
-    }
+    const blockHash = await this.api.rpc.chain.getFinalizedHead();
+    const blockHeader = await this.api.rpc.chain.getHeader(blockHash)
+    return blockHeader.number.toNumber();
   }
 
-  // 获取多资产精度
+  /**
+   * 
+   * @param assetId - The asset ID to get the decimals for (null for native token)
+   * @returns Promise resolving to the asset decimals as a number
+   * @throws Error if the RPC call fails
+   */
   public async getAssetsDecimals(assetId: number|null = null): Promise<number> {
     if (assetId === null) {
         return this.nativeToken.decimals;

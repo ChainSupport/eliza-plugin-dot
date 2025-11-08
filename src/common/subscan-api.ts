@@ -70,12 +70,8 @@ export class SubscanApi {
             const extrinsicIndex = await this.getExtrinsicIndexByHash(hash);
             // 根据交易索引获取转账交易
             const transfer = await this.addressTransferHistory(undefined, extrinsicIndex);
-            if (transfer.length > 0) {
-                return transfer[0];
-            }
-            return null;
+            return transfer[0] ?? null;
         } catch(e) {
-            // console.log(e);
             throw e;
         }
     }
@@ -93,9 +89,6 @@ export class SubscanApi {
      */
     public async decryptTransfersMemo(transfers: TransferDetailWithMemo[], cryptMessage: ICryptMessage): Promise<TransferDetailWithMemo[]> {
         const txs = transfers.map(async (transfer) => {
-            if (transfer.memo == null) {
-                return transfer;
-            }
             try {
                 const memoJson: EncryptedMemo = convertJsonToEncryptedMemo(transfer.memo);
                 transfer.memo = await cryptMessage.decryptMessage(memoJson.e);
@@ -127,63 +120,59 @@ export class SubscanApi {
      */
     public async addressTransferHistory(address: string | null, extrinsic_index: string | undefined = undefined, asset_symbol: string | undefined = undefined, asset_unique_id: string | undefined = undefined, page: number = 0, row: number = 20, filter_nft: boolean = true, success: boolean = true): Promise<TransferDetailWithMemo[]> {
         try {
-        const url = `${this.baseUrl}/api/v2/scan/transfers`;
-        const options: RequestOptions = {
-            method: "POST",
-            headers: this.headers,
-            body: JSON.stringify({
-                "address": address,
-                "row": row,
-                "page": page,
-                "success": success,
-                "extrinsic_index": extrinsic_index,
-                "asset_unique_id": asset_unique_id,
-            }),
-            redirect: "follow",
-        };
+            const url = `${this.baseUrl}/api/v2/scan/transfers`;
+            const options: RequestOptions = {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    "address": address,
+                    "row": row,
+                    "page": page,
+                    "success": success,
+                    "extrinsic_index": extrinsic_index,
+                    "asset_unique_id": asset_unique_id,
+                }),
+                redirect: "follow",
+            };
 
-        const response = await fetch(url, options);
-        const data = await response.json();
-        const memos = await this.getMemoByTransferExtrinsics((data as any).data.transfers.map((item: any) => item.extrinsic_index));
-        const transfers = (data as any).data.transfers.map((item: any) => {
-        
-            return {
-                id: item.transfer_id,
-                extrinsic_index: item.extrinsic_index,
-                extrinsic_hash: item.hash,
-                block_number: item.block_num,
-                asset_unique_id: item.asset_unique_id,
-                asset_symbol: item.asset_symbol,
-                xtrinsic_hash: item.hash,
-                fee: (item.fee / 10 ** 10).toString() + " DOT",
-                success: item.success,
-                value: item.amount,
-                from: item.from,
-                to: item.to,
-                amount: item.amount,
-                timestamp: item.block_timestamp,
-                memo: memos.find((i) => i.extrinsic_index === item.extrinsic_index)?.memo,
-            }
+            const response = await fetch(url, options);
+            const data = await response.json();
+            const memos = await this.getMemoByTransferExtrinsics((data as any).data.transfers.map((item: any) => item.extrinsic_index));
+            const transfers = (data as any).data.transfers.map((item: any) => {
             
-        }).map((item: TransferDetail) => {
-            return {
-                type: item.from === address ? "Send" : "Receive",
-                sender: item.from,
-                recipient: item.to,
-                tokenSymbol: item.asset_symbol,
-                amount: item.value,
-                memo: item.memo,
-                fee: item.fee,
-                timestamp: item.timestamp,
-                txId: item.extrinsic_hash,
-                extrinsic_index: item.extrinsic_index,
-            }
-        })
-
-        // transfers.forEach((item) => {
-        //     // console.log(JSON.stringify(item));
-        // })
-        return transfers;
+                return {
+                    id: item.transfer_id,
+                    extrinsic_index: item.extrinsic_index,
+                    extrinsic_hash: item.hash,
+                    block_number: item.block_num,
+                    asset_unique_id: item.asset_unique_id,
+                    asset_symbol: item.asset_symbol,
+                    xtrinsic_hash: item.hash,
+                    fee: (item.fee / 10 ** 10).toString() + " DOT",
+                    success: item.success,
+                    value: item.amount,
+                    from: item.from,
+                    to: item.to,
+                    amount: item.amount,
+                    timestamp: item.block_timestamp,
+                    memo: memos.find((i) => i.extrinsic_index === item.extrinsic_index)?.memo,
+                }
+                
+            }).map((item: TransferDetail) => {
+                return {
+                    type: item.from === address ? "Send" : "Receive",
+                    sender: item.from,
+                    recipient: item.to,
+                    tokenSymbol: item.asset_symbol,
+                    amount: item.value,
+                    memo: item.memo,
+                    fee: item.fee,
+                    timestamp: item.timestamp,
+                    txId: item.extrinsic_hash,
+                    extrinsic_index: item.extrinsic_index,
+                }
+            })
+            return transfers;
         } catch(e) {
             throw e;
         }

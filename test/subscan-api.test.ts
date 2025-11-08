@@ -62,6 +62,8 @@ describe('SubscanApi', () => {
 
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
+            await expect(api.getMemoByTransferExtrinsics(["0xaw"])).rejects.toThrow();
+
             // expect(result).toHaveLength(1);
             expect(result[0].extrinsic_index).toBe('9602102-2');
             expect(result[0].memo).toBe(mockMemo);
@@ -104,6 +106,7 @@ describe('SubscanApi', () => {
 
             const result = await api.addressTransferHistory(mockAddress);
             expect(result.length).toBeGreaterThan(0);
+            await expect(api.addressTransferHistory("0xaw")).rejects.toThrow();
         });
 
         it('should fetch transfer history by extrinsic index', async () => {
@@ -123,6 +126,7 @@ describe('SubscanApi', () => {
             expect(result).toBeTruthy();
             expect((result as TransferDetailWithMemo).txId).toBe(mockHash);
             expect(result!.extrinsic_index).toBe(mockExtrinsicIndex);
+            await expect(api.getTransferByHash("0xaw")).rejects.toThrow();
         });
     }, {timeout: 10000});
 
