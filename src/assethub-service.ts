@@ -102,6 +102,14 @@ export class AssetHubService extends Service {
     
   }
 
+  static async start(runtime: IAgentRuntime): Promise<Service> {
+    console.log("start polkadot asset hub service");
+    const service = new AssetHubService(runtime);
+    await service.start(runtime);
+    console.log("polkadot asset hub service started");
+    return service;
+  }
+
   /**
    * Static method to stop the AssetHubService instance registered in the runtime.
    * Retrieves the service from the runtime and calls its stop() method to clean up resources.
@@ -110,7 +118,7 @@ export class AssetHubService extends Service {
    * @returns Promise that resolves when the service has been stopped, or immediately if service not found
    */
   static async stop(runtime: IAgentRuntime) {
-
+    console.log("stop polkadot asset hub service");
     const client = runtime.getService(AssetHubService.serviceType);
     if (!client) {
       logger.error("assethub-polkadot service not found");
