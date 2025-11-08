@@ -24,6 +24,7 @@
 import {
     type Action,
     type ActionExample,
+    type ActionResult,
     type Content,
     type HandlerCallback,
     type IAgentRuntime,
@@ -95,35 +96,52 @@ export const MY_WALLET_HISTORY: Action = {
             
             // Get the AssetHubService instance
             const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
+            if (!assethubService.subscanApi || !assethubService.chain.cryptMessage) {
+                throw new Error("Subscan API or cryptMessage is not initialized");
+            }
+            const myAddress = await assethubService.chain.getMyAddress();
             
             // Get wallet address and fetch transfer history with decrypted memos
             const history: TransferDetailWithMemo[] = await assethubService.subscanApi.decryptTransfersMemo(
-                await assethubService.subscanApi.addressTransferHistory(await assethubService.chain.getMyAddress()),
-                await assethubService.chain.cryptMessage
+                await assethubService.subscanApi.addressTransferHistory(myAddress),
+                assethubService.chain.cryptMessage
             );
             
             // Format history as readable text
             const historyText = history.map((item) => {
                 return `Type: ${item.type}, Sender: ${item.sender}, Recipient: ${item.recipient}, Amount: ${item.amount}, Memo: ${item.memo}, Timestamp: ${item.timestamp}, TxId: ${item.txId}`;
             }).join("\n");
+            const response = {
+                text: `Get my wallet history on the POLKADOT AssetHub successfully. history: \n ${historyText}`,
+                content: {history},
+            } satisfies Content;
             if (callback) {
-                callback({
-                    text: `Get my wallet history on the POLKADOT AssetHub successfully. history: \n ${historyText}`,
-                    content: {history: history},
-                });
+                await callback(response);
             }
             logger.info(`Get my wallet history on the POLKADOT AssetHub successfully, history: \n ${historyText}`);
-            return true;
+            return {
+                success: true,
+                text: response.text,
+                data: {
+                    address: myAddress,
+                    history,
+                },
+            } satisfies ActionResult;
         } catch(e) {
             // Handle errors and notify via callback if available
+            const errorText = `Failed to get my wallet history on the POLKADOT AssetHub. error: ${e}`;
             if (callback) {
-                callback({
-                    text: `Failed to get my wallet history on the POLKADOT AssetHub. error: ${e}`,
-                    content: {error: `Failed to get my wallet history on the POLKADOT AssetHub: ${e}`},
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
                 });
             }
-            logger.error(`Failed to get my wallet history on the POLKADOT AssetHub: ${e}`);
-            return false;
+            logger.error(errorText);
+            return {
+                success: false,
+                text: errorText,
+                error: e instanceof Error ? e : String(e),
+            } satisfies ActionResult;
         }
     },
     /** Example prompts for this action (currently empty, can be populated with example history queries) */

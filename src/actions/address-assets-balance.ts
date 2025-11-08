@@ -23,6 +23,7 @@
 import {
     type Action,
     type ActionExample,
+    type ActionResult,
     type Content,
     type HandlerCallback,
     type IAgentRuntime,
@@ -35,7 +36,6 @@ import {
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
 import { checkAddress} from "@polkadot/util-crypto";
-import { error } from 'console';
 
 /**
  * Content interface for address assets balance query.
@@ -190,14 +190,19 @@ export const USER_ASSETS_BALANCE: Action = {
             
             // Validate the extracted content
             if (!validateAddressAssetsBalanceContent(content)) {
+                const errorText = `Invalid address or assetId: ${content.address}, ${content.assetId}`;
                 if (callback) {
-                    callback({
-                        text: `Invalid address or assetId: ${content.address}, ${content.assetId}`,
-                        content: {error: `Invalid address or assetId: ${content.address}, ${content.assetId}`},
+                    await callback({
+                        text: errorText,
+                        content: {error: errorText},
                     });
                 }
-                logger.warn(`Invalid address or assetId: ${content.address}, ${content.assetId}`);
-                return false;
+                logger.warn(errorText);
+                return {
+                    success: false,
+                    text: errorText,
+                    error: errorText,
+                } satisfies ActionResult;
             }
 
             // Get the AssetHubService instance
@@ -208,26 +213,50 @@ export const USER_ASSETS_BALANCE: Action = {
             
             // Query balance and convert from raw balance to human-readable format
             // Divide by 10^decimals to get the actual balance value
-            const balance = await assethubService.chain.getUserBalance(content.address, content.assetId) / BigInt(10 ** decimals);
+            const rawBalance = await assethubService.chain.getUserBalance(content.address, content.assetId);
+            const balance = rawBalance / BigInt(10 ** decimals);
+            const targetAddress = content.address ?? await assethubService.chain.getMyAddress();
+            const assetLabel = content.assetId == null ? "native DOT" : `asset ${content.assetId}`;
+            const ownerLabel = content.address == null ? "Your" : content.address;
+            const logOwnerLabel = content.address == null ? "your" : content.address;
+            const response = {
+                text: `${ownerLabel}'s ${assetLabel} Balance on the POLKADOT AssetHub is ${balance}`,
+                content: {
+                    balance: balance.toString(),
+                    address: targetAddress,
+                    assetId: content.assetId == null ? "DOT" : content.assetId,
+                    decimals: decimals,
+                },
+            } satisfies Content;
             if (callback) {
-                callback( {
-                    text: `${content.address == null ? "Your" : content.address}'s ${content.assetId == null ? "native DOT" : `asset ${content.assetId}`} Balance on the POLKADOT AssetHub is ${balance}`,
-                    content: {balance: balance.toString(), address: content.address == null ? assethubService.chain.getMyAddress() : content.address, assetId: content.assetId == null ? "DOT" : content.assetId, decimals: decimals},
-                });
+                await callback(response);
             }
-            logger.info(`Get ${content.address == null ? "your" : content.address} ${content.assetId == null ? "native DOT" : `asset ${content.assetId}`} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
-            return true;
+            logger.info(`Get ${logOwnerLabel} ${assetLabel} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
+            return {
+                success: true,
+                text: response.text,
+                data: {
+                    balance: balance.toString(),
+                    address: targetAddress,
+                    assetId: content.assetId,
+                    decimals,
+                },
+            } satisfies ActionResult;
 
         } catch (e) {
-            // Handle errors and notify via callback if available
-            logger.error(`Failed to get user's or your own DOT or assets balance on the POLKADOT AssetHub. error: ${e}`);
+            const errorText = `Failed to get user's or your own DOT or assets balance on the POLKADOT AssetHub. error: ${e}`;
+            logger.error(errorText);
             if (callback) {
-                callback({
-                    text: `Failed to get user's or your own DOT or assets balance on the POLKADOT AssetHub. error: ${e}`,
-                    content: {error: `Failed to get user's or your own DOT or assets balance on the POLKADOT AssetHub. error: ${e}`},
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
                 });
             }
-            return false;
+            return {
+                success: false,
+                text: errorText,
+                error: e instanceof Error ? e : String(e),
+            } satisfies ActionResult;
 
         }
     },

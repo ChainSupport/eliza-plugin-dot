@@ -24,6 +24,7 @@
 import {
     type Action,
     type ActionExample,
+    type ActionResult,
     type Content,
     type HandlerCallback,
     type IAgentRuntime,
@@ -113,24 +114,41 @@ export const GET_MY_WALLET_INFO: Action = {
             
             // Convert balance from raw format to human-readable format
             const amount = balance / BigInt(10 ** decimals);
+            const response = {
+                text: `My wallet address is ${address}, and my balance is ${amount.toString()}`,
+                content: {address: address, balance: balance.toString()},
+            } satisfies Content;
             if (callback) {
-                callback({
-                    text: `My wallet address is ${address}, and my balance is ${amount.toString()}`,
-                    content: {address: address, balance: balance.toString()},
-                });
+                await callback(response);
             }
             logger.info(`Get my wallet info on the POLKADOT AssetHub successfully, address: ${address}, balance: ${balance.toString()}`);
-            return true;
+            const result: ActionResult = {
+                success: true,
+                text: response.text,
+                data: {
+                    address,
+                    balance: balance.toString(),
+                    amount: amount.toString(),
+                    decimals,
+                },
+            };
+            return result;
         } catch(e) {
             // Handle errors and notify via callback if available
-            logger.error(`Failed to get my wallet info on the POLKADOT AssetHub`);
+            const errorMessage = `Failed to get my wallet info on the POLKADOT AssetHub`;
+            logger.error(errorMessage);
             if (callback) {
-                callback({
-                    text: `Failed to get my wallet info on the POLKADOT AssetHub`,
-                    content: {error: `Failed to get my wallet info on the POLKADOT AssetHub`},
+                await callback({
+                    text: errorMessage,
+                    content: {error: errorMessage},
                 });
             }
-            return false;
+            const result: ActionResult = {
+                success: false,
+                text: errorMessage,
+                error: e instanceof Error ? e : String(e),
+            };
+            return result;
         }
     },
     /** Example prompts for this action (currently empty, can be populated with example wallet info queries) */

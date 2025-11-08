@@ -25,6 +25,7 @@ import { checkAddress} from "@polkadot/util-crypto";
 import {
     type Action,
     type ActionExample,
+    type ActionResult,
     type Content,
     type HandlerCallback,
     type IAgentRuntime,
@@ -194,35 +195,47 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         
         // Validate the extracted content
         if (!validateTransferContent(content)) {
-    if (callback) {
-            callback({
-                text: `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`,
-                content: {error: `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`},
-            });
+            const errorText = `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`;
+            if (callback) {
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
+                });
+            }
+            logger.warn(errorText);
+            return {
+                success: false,
+                text: errorText,
+                error: errorText,
+            } satisfies ActionResult;
         }
-        logger.warn(`Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`);
-        return false;
-    }
     
     // Get the AssetHubService instance
     const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
+    const senderAddress = await assethubService.chain.getMyAddress();
     
     // Check balance before transfer
-    const balance = await assethubService.chain.getUserBalance(await assethubService.chain.getMyAddress(), content.assetId);
+    const balance = await assethubService.chain.getUserBalance(senderAddress, content.assetId);
     
     // Get asset decimals for amount conversion
     const decimals = await assethubService.chain.getAssetsDecimals(content.assetId);
     
     // Convert amount to raw balance (multiply by 10^decimals) and check if sufficient
-    if (balance < BigInt(content.amount * 10**decimals)) {
+    const requiredAmount = BigInt(Math.round(content.amount * 10 ** decimals));
+    if (balance < requiredAmount) {
+        const errorText = `Insufficient balance. Your ${content.assetId == null ? "DOT" : "asset " + content.assetId} balance: ${balance}`;
         if (callback) {
-            callback({
-                text: `Insufficient balance. Your ${content.assetId == null ? "DOT" :"asset "+content.assetId} balance: ${balance}` ,
-                content: {error: `Insufficient balance. Your ${content.assetId == null ? "DOT" :"asset "+content.assetId} balance: ${balance}`},
+            await callback({
+                text: errorText,
+                content: {error: errorText},
             });
         }
-        logger.warn(`Insufficient balance. Your ${content.assetId == null ? "DOT" :"asset "+content.assetId} balance: ${balance}`);
-        return false;
+        logger.warn(errorText);
+        return {
+            success: false,
+            text: errorText,
+            error: errorText,
+        } satisfies ActionResult;
     }
 
     // Execute transfer based on asset type
@@ -234,27 +247,48 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         // Transfer asset (token)
         txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, content.amount, content.assetId, content.memo);
     }
+    const response = {
+        text: `Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,
+        content: {
+            txHash,
+            assetId: content.assetId == null ? "DOT" : content.assetId,
+            recipient: content.recipient,
+            amount: content.amount,
+            memo: content.memo,
+        },
+    } satisfies Content;
     if (callback) {
-        callback({
-            text: `Transfer ${content.assetId == null ? "DOT" :"asset "+content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,
-            content: {txHash: txHash, assetId: content.assetId == null ? "DOT" :"asset "+content.assetId, recipient: content.recipient, amount: content.amount, memo: content.memo},
-        });
+        await callback(response);
     }
-    logger.info(`Transfer ${content.assetId == null ? "DOT" :"asset "+content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
-    return true;
+    logger.info(`Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
+    return {
+        success: true,
+        text: response.text,
+        data: {
+            txHash,
+            assetId: content.assetId,
+            recipient: content.recipient,
+            amount: content.amount,
+            memo: content.memo ?? undefined,
+        },
+    } satisfies ActionResult;
 
     } catch (e) {
         // Handle errors and notify via callback if available
-        logger.error(`Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`);
+        const errorText = `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`;
+        logger.error(errorText);
         if (callback) {
-            callback({
-                text: `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`,
-                content: {error: `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`},
+            await callback({
+                text: errorText,
+                content: {error: errorText},
             });
         }
-        return false;
+        return {
+            success: false,
+            text: errorText,
+            error: e instanceof Error ? e : String(e),
+        } satisfies ActionResult;
     }
-    
 },
 /** Example prompts for this action (currently empty, can be populated with example transfer queries) */
 examples: [

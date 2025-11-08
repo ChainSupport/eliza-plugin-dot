@@ -26,6 +26,7 @@ import { checkAddress} from "@polkadot/util-crypto";
 import {
     type Action,
     type ActionExample,
+    type ActionResult,
     type Content,
     type HandlerCallback,
     type IAgentRuntime,
@@ -151,37 +152,56 @@ export const SEND_MESSAGE: Action = {
         
         // Validate the extracted content
         if (!validateSendMessageContent(content)) {
+            const errorText = `Invalid recipient '${content.recipient}' or message '${content.message}'`;
             if (callback) {
-                callback({
-                    text: `Invalid recipient '${content.recipient}' or message '${content.message}'`,
-                    content: {error: `Invalid recipient '${content.recipient}' or message '${content.message}'`},
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
                 });
             }
-            logger.warn(`Invalid recipient '${content.recipient}' or message '${content.message}'`);
-            return false;
+            logger.warn(errorText);
+            return {
+                success: false,
+                text: errorText,
+                error: errorText,
+            } satisfies ActionResult;
         }
         
         // Get the AssetHubService instance and send the encrypted message
         const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
         const txHash = await assethubService.chain.sendMessage(content.recipient, content.message);
+        const response = {
+            text: `Send message '${content.message}' to ${content.recipient} successfully. txHash is ${txHash}`,
+            content: {txHash: txHash, recipient: content.recipient, message: content.message},
+        } satisfies Content;
         if (callback) {
-            callback({
-                text: `Send message '${content.message}' to ${content.recipient} successfully. txHash is ${txHash}`,
-                content: {txHash: txHash, recipient: content.recipient, message: content.message},
-            });
+            await callback(response);
         }
         logger.info(`Send message '${content.message}' to ${content.recipient} successfully, txHash: ${txHash}`);
-        return true;
+        return {
+            success: true,
+            text: response.text,
+            data: {
+                txHash,
+                recipient: content.recipient,
+                message: content.message,
+            },
+        } satisfies ActionResult;
         } catch (e) {
             // Handle errors and notify via callback if available
-            logger.error(`Failed to send message`);
+            const errorText = `Failed to send message`;
+            logger.error(errorText);
             if (callback) {
-                callback({
-                    text: `Failed to send message`,
-                    content: {error: `Failed to send message`},
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
                 });
             }
-            return false;
+            return {
+                success: false,
+                text: errorText,
+                error: e instanceof Error ? e : String(e),
+            } satisfies ActionResult;
         }
     },
     /** Example prompts for this action (currently empty, can be populated with example message queries) */
