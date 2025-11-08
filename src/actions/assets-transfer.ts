@@ -233,6 +233,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         
         // Validate the extracted content
         if (!validateTransferContent(runtime,content)) {
+            runtime.logger.warn(`validateTransferContent: ${JSON.stringify(content)}, assetId type: ${typeof content.assetId}, recipient type: ${typeof content.recipient}, amount type: ${typeof content.amount}`);
             const errorText = `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`;
             if (callback) {
                 await callback({
@@ -247,86 +248,88 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
                 error: errorText,
             } satisfies ActionResult;
         }
-    
-    // Get the AssetHubService instance
-    const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
-    const senderAddress = await assethubService.chain.getMyAddress();
-    
-    // Check balance before transfer
-    const balance = await assethubService.chain.getUserBalance(senderAddress, content.assetId);
-    
-    // Get asset decimals for amount conversion
-    const decimals = await assethubService.chain.getAssetsDecimals(content.assetId);
-    
-    // Convert amount to raw balance (multiply by 10^decimals) and check if sufficient
-    const requiredAmount = BigInt(Math.round(content.amount * 10 ** decimals));
-    if (balance < requiredAmount) {
-        const errorText = `Insufficient balance. Your ${content.assetId == null ? "DOT" : "asset " + content.assetId} balance: ${balance}`;
-        if (callback) {
-            await callback({
-                text: errorText,
-                content: {error: errorText},
-            });
-        }
-        runtime.logger.warn(errorText);
-        return {
-            success: false,
-            text: errorText,
-            error: errorText,
-        } satisfies ActionResult;
-    }
 
-    // Execute transfer based on asset type
-    let txHash: string;
-    if (content.assetId == null) {
-        // Transfer native DOT
-        txHash = await assethubService.chain.transferWithMemo(content.recipient, content.amount, content.memo);
-    } else {
-        // Transfer asset (token)
-        txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, content.amount, content.assetId, content.memo);
-    }
-    const response = {
-        text: `Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,
-        content: {
-            txHash,
-            assetId: content.assetId == null ? "DOT" : content.assetId,
-            recipient: content.recipient,
-            amount: content.amount,
-            memo: content.memo,
-        },
-    } satisfies Content;
-    if (callback) {
-        await callback(response);
-    }
-    runtime.logger.info(`Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
-    return {
-        success: true,
-        text: response.text,
-        data: {
-            txHash,
-            assetId: content.assetId,
-            recipient: content.recipient,
-            amount: content.amount,
-            memo: content.memo ?? undefined,
-        },
-    } satisfies ActionResult;
-
-    } catch (e) {
-        // Handle errors and notify via callback if available
-        const errorText = `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`;
-        runtime.logger.error(errorText);
-        if (callback) {
-            await callback({
+        runtime.logger.info(`validateTransferContent: ${JSON.stringify(content)}, assetId type: ${typeof content.assetId}, recipient type: ${typeof content.recipient}, amount type: ${typeof content.amount}`);
+    
+        // Get the AssetHubService instance
+        const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
+        const senderAddress = await assethubService.chain.getMyAddress();
+        
+        // Check balance before transfer
+        const balance = await assethubService.chain.getUserBalance(senderAddress, content.assetId);
+        
+        // Get asset decimals for amount conversion
+        const decimals = await assethubService.chain.getAssetsDecimals(content.assetId);
+        
+        // Convert amount to raw balance (multiply by 10^decimals) and check if sufficient
+        const requiredAmount = BigInt(Math.round(content.amount * 10 ** decimals));
+        if (balance < requiredAmount) {
+            const errorText = `Insufficient balance. Your ${content.assetId == null ? "DOT" : "asset " + content.assetId} balance: ${balance}`;
+            if (callback) {
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
+                });
+            }
+            runtime.logger.warn(errorText);
+            return {
+                success: false,
                 text: errorText,
-                content: {error: errorText},
-            });
+                error: errorText,
+            } satisfies ActionResult;
         }
+
+        // Execute transfer based on asset type
+        let txHash: string;
+        if (content.assetId == null) {
+            // Transfer native DOT
+            txHash = await assethubService.chain.transferWithMemo(content.recipient, content.amount, content.memo);
+        } else {
+            // Transfer asset (token)
+            txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, content.amount, content.assetId, content.memo);
+        }
+        const response = {
+            text: `Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,
+            content: {
+                txHash,
+                assetId: content.assetId == null ? "DOT" : content.assetId,
+                recipient: content.recipient,
+                amount: content.amount,
+                memo: content.memo,
+            },
+        } satisfies Content;
+        if (callback) {
+            await callback(response);
+        }
+        runtime.logger.info(`Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
         return {
-            success: false,
-            text: errorText,
-            error: e instanceof Error ? e : String(e),
+            success: true,
+            text: response.text,
+            data: {
+                txHash,
+                assetId: content.assetId,
+                recipient: content.recipient,
+                amount: content.amount,
+                memo: content.memo ?? undefined,
+            },
         } satisfies ActionResult;
-    }
+
+        } catch (e) {
+            // Handle errors and notify via callback if available
+            const errorText = `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`;
+            runtime.logger.error(errorText);
+            if (callback) {
+                await callback({
+                    text: errorText,
+                    content: {error: errorText},
+                });
+            }
+            return {
+                success: false,
+                text: errorText,
+                error: e instanceof Error ? e : String(e),
+            } satisfies ActionResult;
+        }
 },
 /** Example prompts for this action (currently empty, can be populated with example transfer queries) */
 examples: [

@@ -185,7 +185,7 @@ export const SEND_MESSAGE: Action = {
                 error: errorText,
             } satisfies ActionResult;
         }
-        
+        runtime.logger.info(`validateSendMessageContent: ${JSON.stringify(content)}, recipient type: ${typeof content.recipient}, message type: ${typeof content.message}`);
         // Get the AssetHubService instance and send the encrypted message
         const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
         const txHash = await assethubService.chain.sendMessage(content.recipient, content.message);

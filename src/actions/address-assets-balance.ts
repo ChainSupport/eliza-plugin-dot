@@ -234,7 +234,8 @@ export const USER_ASSETS_BALANCE: Action = {
                     error: errorText,
                 } satisfies ActionResult;
             }
-
+            runtime.logger.info(`validateAddressAssetsBalanceContent: ${JSON.stringify(content)}, address type: ${typeof content.address}, assetId type: ${typeof content.assetId}`);
+            
             // Get the AssetHubService instance
             const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
 
