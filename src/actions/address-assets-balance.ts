@@ -244,7 +244,7 @@ export const USER_ASSETS_BALANCE: Action = {
             // Query balance and convert from raw balance to human-readable format
             // Divide by 10^decimals to get the actual balance value
             const address = content.address ?? await assethubService.chain.getMyAddress();
-            const rawBalance = await assethubService.chain.getUserBalance(address);
+            const rawBalance = await assethubService.chain.getUserBalance(address, content.assetId);
             const balance = (Number(rawBalance) / (10 ** decimals)).toString();
             const assetLabel = content.assetId == null ? "native DOT" : `asset ${content.assetId}`;
             const response = {
