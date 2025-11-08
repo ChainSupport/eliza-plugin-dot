@@ -38,6 +38,7 @@ import {
     parseJSONObjectFromText,
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
+import {z} from "zod";
 
 /**
  * Content interface for sending encrypted messages.
@@ -51,6 +52,20 @@ interface SendMessageContent extends Content {
 }
 
 /**
+ * Schema for validating the send message content.
+ * Checks if recipient is a valid address and message is not null.
+ * 
+ * @returns the schema for validating the send message content
+ */
+const SendMessageContentSchema = z.object({
+    recipient: z.preprocess(
+      (value) => (value.toString().trim()),
+      z.string()
+    ),
+    message: z.string(),
+  }).strict();
+
+/**
  * Validates the send message content.
  * Checks if recipient is a valid address and message is not null.
  * 
@@ -59,12 +74,14 @@ interface SendMessageContent extends Content {
  */
 function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessageContent): boolean {
     runtime.logger.info(`validateSendMessageContent: ${JSON.stringify(content)}`);
-    if (content.recipient === null || content.recipient === "" || !checkAddress(content.recipient, 0)[0]) {
-        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
+    const result = SendMessageContentSchema.safeParse(content);
+    if (!result.success) {
+        runtime.logger.warn(`validateSendMessageContent: ${result.error.message}`);
         return false;
     }
-    if (content.message === null || content.message === "") {
-        runtime.logger.warn(`message ${content.message} is not a valid message`);
+    content = result.data as SendMessageContent
+    if (!checkAddress(content.recipient, 0)[0]) {
+        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return false;
     }
     return true;

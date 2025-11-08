@@ -36,6 +36,8 @@ import {
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
 import { checkAddress} from "@polkadot/util-crypto";
+import {z} from "zod";
+
 
 /**
  * Content interface for address assets balance query.
@@ -49,6 +51,25 @@ interface AddressAssetsBalanceContent extends Content {
 }
 
 /**
+ * Schema for validating the address assets balance content.
+ * Checks if the address is valid (when provided) and if assetId is a valid number (when provided).
+ * 
+ * @returns the schema for validating the address assets balance content
+ */
+const AddressAssetsBalanceContentSchema = z.object({
+    address: z.preprocess(
+      (value) => (value === "null" || value === "" || value === null ? null : value.toString().trim()),
+      z.string().nullable()
+    ),
+    assetId: z.preprocess(
+      (value) => (value === "null" || value === "" || value === null ? null : Number(value.toString().trim())),
+      z.number().nullable()
+    ),
+  }).strict();
+
+
+
+/**
  * Validates the address assets balance content.
  * Checks if the address is valid (when provided) and if assetId is a valid number (when provided).
  * 
@@ -57,13 +78,20 @@ interface AddressAssetsBalanceContent extends Content {
  */
 function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content: AddressAssetsBalanceContent): boolean {
     runtime.logger.info(`validateAddressAssetsBalanceContent: ${JSON.stringify(content)}, address type: ${typeof content.address}, assetId type: ${typeof content.assetId}`);
-    if (content.address != null && content.address.trim() !=="") {
-        if (!checkAddress(content.address.trim(), 0)[0]) {
-            runtime.logger.warn(`address ${content.address.trim()} is not a valid address`);
-            return false;
-        }
+    const result = AddressAssetsBalanceContentSchema.safeParse(content);
+    if (!result.success) {
+        runtime.logger.warn(`validateAddressAssetsBalanceContent: ${result.error.message}`);
+        return false;
     }
-    content.assetId = content.assetId === null || content.assetId === undefined ? null : Number(content.assetId.toString().trim());
+    content = result.data as AddressAssetsBalanceContent
+    if (content.address != null && !checkAddress(content.address, 0)[0]) {
+        runtime.logger.warn(`address ${content.address} is not a valid address`);
+        return false;
+    }
+    if (content.assetId != null && (typeof content.assetId !== 'number' || content.assetId < 0)) {
+        runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
+        return false;
+    }
     return true;
 }
 

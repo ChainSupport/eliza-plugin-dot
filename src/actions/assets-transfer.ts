@@ -37,7 +37,8 @@ import {
     parseJSONObjectFromText,
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
-import { run } from "node:test";
+// import { run } from "node:test";
+import {z} from "zod";
   
 /**
  * Content interface for asset transfer.
@@ -54,6 +55,30 @@ interface TransferContent extends Content {
     memo: string | null;
   }
 
+
+/**
+ * Schema for validating the transfer content.
+ * Checks if assetId is a valid number (when provided), recipient is a valid address,
+ * and amount is a valid number.
+ * 
+ * @returns the schema for validating the transfer content
+ */
+const TransferContentSchema = z.object({
+    assetId: z.preprocess(
+      (value) => (value === "null" || value === "" || value === null ? null : Number(value.toString().trim())),
+      z.number().nullable()
+    ),
+    recipient: z.string(),
+    amount: z.preprocess(
+      (value) => (Number(value.toString().trim())),
+      z.number()
+    ),
+    memo: z.preprocess(
+        (value) => (value === "null" || value === "" || value === null ? null : value.toString().trim()),
+        z.string().nullable()
+      ),
+  }).strict();
+
 /**
  * Validates the transfer content.
  * Checks if assetId is a valid number (when provided), recipient is a valid address,
@@ -64,19 +89,20 @@ interface TransferContent extends Content {
  */
 function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): boolean {
     runtime.logger.info(`validateTransferContent: ${JSON.stringify(content)}`);
-    if (content.recipient == null || !checkAddress(content.recipient.trim(), 0)[0]) {
-        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
+    const result = TransferContentSchema.safeParse(content);
+    if (!result.success) {
+        runtime.logger.warn(`validateTransferContent: ${result.error.message}`);
         return false;
     }
-
-    if (content.amount === null || content.amount === undefined) {
+    content = result.data as TransferContent
+    if (!checkAddress(content.recipient, 0)[0]) {
+        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
+        return false;
+    }   
+    if (content.amount <= 0) {
         runtime.logger.warn(`amount ${content.amount} is not a valid number`);
         return false;
     }
-
-    content.amount = Number(content.amount.toString().trim());
-    content.assetId = content.assetId === null || content.assetId === undefined? null : Number(content.assetId.toString().trim());
-
     return true;
 }
 
