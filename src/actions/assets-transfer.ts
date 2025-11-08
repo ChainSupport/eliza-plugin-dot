@@ -114,7 +114,7 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
  * - Transfers without memo
  */
 const transferTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
-    Tip: USDT's assetId is 1984, USDC's assetId is 1337, DOTA's assetId is 18
+    Tip: USDT's assetId is 1984, USDC's assetId is 1337, DOTA's assetId is 18, DOT's assetId is null
     Example responses:
     Transfer Assets:
     \`\`\`json
