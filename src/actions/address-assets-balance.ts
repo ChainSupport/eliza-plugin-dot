@@ -56,12 +56,13 @@ interface AddressAssetsBalanceContent extends Content {
  * @returns true if the content is valid, false otherwise
  */
 function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content: AddressAssetsBalanceContent): boolean {
-    if (content.address !== null && content.address !== "") {
-        if (!checkAddress(content.address, 0)[0]) {
-            runtime.logger.warn(`address ${content.address} is not a valid address`);
+    if (content.address !== null && content.address.trim() !== "") {
+        if (!checkAddress(content.address.trim(), 0)[0]) {
+            runtime.logger.warn(`address ${content.address.trim()} is not a valid address`);
             return false;
         }
     }
+    content.assetId = content.assetId === null ? null : Number(content.assetId.toString().trim());
     return true;
 }
 

@@ -64,7 +64,7 @@ interface TransferContent extends Content {
  */
 function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): boolean {
 
-    if (content.recipient === null || !checkAddress(content.recipient, 0)[0]) {
+    if (content.recipient === null || !checkAddress(content.recipient.trim(), 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return false;
     }
@@ -74,7 +74,8 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
         return false;
     }
 
-    content.amount = Number(content.amount);
+    content.amount = Number(content.amount.toString().trim());
+    content.assetId = content.assetId === null ? null : Number(content.assetId.toString().trim());
 
     return true;
 }
