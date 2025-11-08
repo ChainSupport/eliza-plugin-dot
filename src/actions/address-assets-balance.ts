@@ -243,17 +243,15 @@ export const USER_ASSETS_BALANCE: Action = {
             
             // Query balance and convert from raw balance to human-readable format
             // Divide by 10^decimals to get the actual balance value
-            const rawBalance = await assethubService.chain.getUserBalance(content.address, content.assetId);
+            const address = content.address ?? await assethubService.chain.getMyAddress();
+            const rawBalance = await assethubService.chain.getUserBalance(address);
             const balance = (Number(rawBalance) / (10 ** decimals)).toString();
-            const targetAddress = content.address ?? await assethubService.chain.getMyAddress();
             const assetLabel = content.assetId == null ? "native DOT" : `asset ${content.assetId}`;
-            const ownerLabel = content.address == null ? "Your" : content.address;
-            const logOwnerLabel = content.address == null ? "your" : content.address;
             const response = {
-                text: `${ownerLabel}'s ${assetLabel} Balance on the POLKADOT AssetHub is ${balance}`,
+                text: `${content.address == null ? "Your" : content.address}'s ${assetLabel} Balance on the POLKADOT AssetHub is ${balance}`,
                 content: {
                     balance: balance.toString(),
-                    address: targetAddress,
+                    address: address,
                     assetId: content.assetId == null ? "DOT" : content.assetId,
                     decimals: decimals,
                 },
@@ -261,13 +259,13 @@ export const USER_ASSETS_BALANCE: Action = {
             if (callback) {
                 await callback(response);
             }
-            runtime.logger.info(`Get ${logOwnerLabel} ${assetLabel} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
+            runtime.logger.info(`Get ${address} ${assetLabel} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
             return {
                 success: true,
                 text: response.text,
                 data: {
                     balance: balance.toString(),
-                    address: targetAddress,
+                    address: content.address ?? await assethubService.chain.getMyAddress(),
                     assetId: content.assetId,
                     decimals,
                 },
