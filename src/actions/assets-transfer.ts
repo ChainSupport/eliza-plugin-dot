@@ -281,10 +281,10 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         let txHash: string;
         if (content.assetId == null) {
             // Transfer native DOT
-            txHash = await assethubService.chain.transferWithMemo(content.recipient, content.amount, content.memo);
+            txHash = await assethubService.chain.transferWithMemo(content.recipient, requiredAmount, content.memo);
         } else {
             // Transfer asset (token)
-            txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, content.amount, content.assetId, content.memo);
+            txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, requiredAmount, content.assetId, content.memo);
         }
         const response = {
             text: `Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,

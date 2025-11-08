@@ -382,8 +382,8 @@ describe('SubstrateChain', () => {
             console.log("bobChain");
             const bobAddress = await bobChain.getMyAddress();
             console.log("bobAddress", bobAddress);
-            await expect(aliceChain.transferWithMemo("invalid-address-string", 120000, "hello bob, i am alice, i am sending you 0.01 DOT")).rejects.toThrow();
-            const txHash = await aliceChain.transferWithMemo(bobAddress, 120000, "hello bob, i am alice, i am sending you 0.01 DOT");
+            await expect(aliceChain.transferWithMemo("invalid-address-string", BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT")).rejects.toThrow();
+            const txHash = await aliceChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo("0xecc6eb0a69067377ee84de944accc9bc2c54f2cf104f1fdb3261b114f9b115ff");
@@ -392,7 +392,7 @@ describe('SubstrateChain', () => {
             const bobMemo: TransferDetailWithMemo = await bobChain.getTransferMemo("0xecc6eb0a69067377ee84de944accc9bc2c54f2cf104f1fdb3261b114f9b115ff");
             console.log("bobMemo", JSON.stringify(bobMemo));
             expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you a message");
-            const txHash2 = await aliceChain.transferWithMemo(bobAddress, 120000);
+            const txHash2 = await aliceChain.transferWithMemo(bobAddress, BigInt(120000));
             console.log("txHash2", txHash2);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             expect(txHash2).toBeTruthy();
@@ -418,14 +418,14 @@ describe('SubstrateChain', () => {
             );
             const bobAddress = await bobChain.getMyAddress();
             console.log("bobAddress", bobAddress);
-            await expect(aliceChain.assetsTransferWithMemo("invalid-address-string", 100000, 18, "hello bob, i am alice, i am sending you 18 assets")).rejects.toThrow();
-            const txHash = await aliceChain.assetsTransferWithMemo(bobAddress, 1000, 18, "hello bob, i am alice, i am sending you 18 assets");
+            await expect(aliceChain.assetsTransferWithMemo("invalid-address-string", BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets")).rejects.toThrow();
+            const txHash = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo("0xb3519bf43dbec08ef7cf5a493e5d3701cfc9ec6801f7a87889e3e3fd3a3507f4");
             console.log("memo", memo.memo);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you 18 assets");
-            const txHash2 = await aliceChain.assetsTransferWithMemo(bobAddress, 1000, 18);
+            const txHash2 = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18);
             console.log("txHash2", txHash2);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             expect(txHash2).toBeTruthy();

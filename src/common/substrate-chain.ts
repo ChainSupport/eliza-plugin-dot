@@ -385,7 +385,7 @@ export class SubstrateChain {
      * @returns Promise resolving to the transaction hash
      * @throws Error if address is invalid or transaction fails
      */
-    public async transferWithMemo(to: string, amount: number, memo: string | null = null): Promise<string> {
+    public async transferWithMemo(to: string, amount: bigint, memo: string | null = null): Promise<string> {
         try {
         if (!this.validateAddress(to)) {
             throw new Error("to is not a valid address");
@@ -421,7 +421,7 @@ export class SubstrateChain {
             if (message == null) {
                 throw new Error("message is null");
             }
-            return await this.transferWithMemo(to, 0, message);
+            return await this.transferWithMemo(to, BigInt(0), message);
         }
         catch (e) {
             throw Error(`Failed to sendMessage: ${e}`);
@@ -440,7 +440,7 @@ export class SubstrateChain {
      * @returns Promise resolving to the transaction hash
      * @throws Error if amount is 0, address is invalid, or transaction fails
      */
-    public async assetsTransferWithMemo(to: string, amount: number, assetId : number | null, memo: string | null = null): Promise<string> {
+    public async assetsTransferWithMemo(to: string, amount: bigint, assetId : number | null, memo: string | null = null): Promise<string> {
         try {
             if (assetId == null) {
                 return await this.transferWithMemo(to, amount, memo);
