@@ -94,7 +94,7 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
         runtime.logger.warn(`validateTransferContent: ${result.error.message}`);
         return [false, null];
     }
-    const validatedContent = result.data as TransferContent
+    content = result.data as TransferContent
     if (!checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return [false, null];
@@ -103,7 +103,7 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
         runtime.logger.warn(`amount ${content.amount} is not a valid number`);
         return [false, null];
     }
-    return [true, validatedContent];
+    return [true, content];
 }
 
 /**
@@ -232,7 +232,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         const c = parseJSONObjectFromText(result) as TransferContent;
         const content = validateTransferContent(runtime, c)[1];
         if (content == null) {
-            const errorText = `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`;
+            const errorText = `Invalid assetId, recipient, or amount: ${c.assetId}, ${c.recipient}, ${c.amount}`;
             if (callback) {
                 await callback({
                     text: errorText,

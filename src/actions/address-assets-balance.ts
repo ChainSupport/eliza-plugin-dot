@@ -83,7 +83,7 @@ function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content:
         runtime.logger.warn(`validateAddressAssetsBalanceContent: ${result.error.message}`);
         return [false, null];
     }
-    const validatedContent = result.data as AddressAssetsBalanceContent
+    content = result.data as AddressAssetsBalanceContent
     if (content.address != null && !checkAddress(content.address, 0)[0]) {
         runtime.logger.warn(`address ${content.address} is not a valid address`);
         return [false, null];
@@ -92,7 +92,7 @@ function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content:
         runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
         return [false, null];
     }
-    return [true, validatedContent];
+    return [true, content];
 }
 
 /**
@@ -219,7 +219,7 @@ export const USER_ASSETS_BALANCE: Action = {
             const c = parseJSONObjectFromText(result) as AddressAssetsBalanceContent;
             const content = validateAddressAssetsBalanceContent(runtime, c)[1];
             if (content == null) {
-                const errorText = `Invalid address or assetId: ${content.address}, ${content.assetId}`;
+                const errorText = `Invalid address or assetId: ${c.address}, ${c.assetId}`;
                 if (callback) {
                     await callback({
                         text: errorText,

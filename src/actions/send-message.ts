@@ -79,12 +79,12 @@ function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessage
         runtime.logger.warn(`validateSendMessageContent: ${result.error.message}`);
         return [false, null];
     }
-    const validatedContent = result.data as SendMessageContent
+    content = result.data as SendMessageContent
     if (!checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return [false, null];
     }
-    return [true, validatedContent];
+    return [true, content];
 }
 
 /**
@@ -171,7 +171,7 @@ export const SEND_MESSAGE: Action = {
         const content = validateSendMessageContent(runtime, c)[1];
         // Validate the extracted content
         if (content == null) {
-            const errorText = `Invalid recipient '${content.recipient}' or message '${content.message}'`;
+            const errorText = `Invalid recipient '${c.recipient}' or message '${c.message}'`;
             if (callback) {
                 await callback({
                     text: errorText,
