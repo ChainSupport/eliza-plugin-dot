@@ -74,6 +74,8 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
         return false;
     }
 
+    content.amount = Number(content.amount);
+
     return true;
 }
 
