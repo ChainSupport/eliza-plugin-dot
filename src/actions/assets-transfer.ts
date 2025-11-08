@@ -145,6 +145,11 @@ similes:[
     "WITHDRAW_DOT",
     "WITHDRAW_ASSETS",
     "WITHDRAW_TOKEN",
+    "SEND_MESSAGE_PRIVATE_WITH_ASSETS_TRANSFER",
+    "SEND_ENCRYPTED_MESSAGE_WITH_ASSETS_TRANSFER",
+    "SEND_MESSAGE_AND_NO_TRANSFER",
+    "TELL_SOMEONE_SOMETHIG_WITH_ASSETS_TRANSFER",
+    "SAY_SOMETHING_TO_SOMEONE_WITH_ASSETS_TRANSFER",
     ],
 description: "Transfer My assets or native DOT to other users on the POLKADOT AssetHub",
 /**
@@ -177,7 +182,7 @@ validate: async (runtime: IAgentRuntime, message: Memory, state: State, _option:
  */
 handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
     try {
-        logger.info("start to transfer assets or native DOT on the POLKADOT AssetHub");
+        runtime.logger.info("start to transfer assets or native DOT on the POLKADOT AssetHub");
         
         // Compose prompt from state and template
         const transferPrompt = composePromptFromState({
@@ -202,7 +207,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
                     content: {error: errorText},
                 });
             }
-            logger.warn(errorText);
+            runtime.logger.warn(errorText);
             return {
                 success: false,
                 text: errorText,
@@ -230,7 +235,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
                 content: {error: errorText},
             });
         }
-        logger.warn(errorText);
+        runtime.logger.warn(errorText);
         return {
             success: false,
             text: errorText,
@@ -260,7 +265,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
     if (callback) {
         await callback(response);
     }
-    logger.info(`Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
+    runtime.logger.info(`Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash: ${txHash}`);
     return {
         success: true,
         text: response.text,
@@ -276,7 +281,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
     } catch (e) {
         // Handle errors and notify via callback if available
         const errorText = `Failed to transfer assets or native DOT on the POLKADOT AssetHub. error: ${e}`;
-        logger.error(errorText);
+        runtime.logger.error(errorText);
         if (callback) {
             await callback({
                 text: errorText,

@@ -92,15 +92,14 @@ const sendMessageTemplate = `
  * transfers with encrypted memos. The message is encrypted using the recipient's public key.
  */
 export const SEND_MESSAGE: Action = {
-    name: "SEND_MESSAGE",
+    name: "SEND_MESSAGE_WITH_NO_TRANSFER",
     similes: [
         "SEND_MESSAGE",
-        "SEND_MESSAGE_POLKADOT",
+        "SEND_PRIVATE_MESSAGE",
         "SEND_ENCRYPTED_MESSAGE",
-        "SEND_ENCRYPTED_MESSAGE_POLKADOT",
-        "SEND_MESSAGE_ASSET_HUB",
-        "SEND_ENCRYPTED_MESSAGE_ASSET_HUB",
-        "SEND_ENCRYPTED_MESSAGE_ASSET_HUB_POLKADOT",
+        "TELL_SOMEONE_SOMETHIG",
+        "SAY_SOMETHING_TO_SOMEONE",
+        "TELL_SOMETHING_TO_SOMEONE_NO_TRANSFER",
     ],
     description: "Send an encrypted message to other users on the POLKADOT AssetHub",
     /**
@@ -134,7 +133,7 @@ export const SEND_MESSAGE: Action = {
     handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
     
         try {
-        logger.info("start to send an encrypted message to other users on the POLKADOT AssetHub");
+        runtime.logger.info("start to send an encrypted message to other users on the POLKADOT AssetHub");
         
         // Compose prompt from state and template
         const sendMessagePrompt = composePromptFromState({
@@ -159,7 +158,7 @@ export const SEND_MESSAGE: Action = {
                     content: {error: errorText},
                 });
             }
-            logger.warn(errorText);
+            runtime.logger.warn(errorText);
             return {
                 success: false,
                 text: errorText,
@@ -177,7 +176,7 @@ export const SEND_MESSAGE: Action = {
         if (callback) {
             await callback(response);
         }
-        logger.info(`Send message '${content.message}' to ${content.recipient} successfully, txHash: ${txHash}`);
+        runtime.logger.info(`Send message '${content.message}' to ${content.recipient} successfully, txHash: ${txHash}`);
         return {
             success: true,
             text: response.text,
@@ -190,7 +189,7 @@ export const SEND_MESSAGE: Action = {
         } catch (e) {
             // Handle errors and notify via callback if available
             const errorText = `Failed to send message`;
-            logger.error(errorText);
+            runtime.logger.error(errorText);
             if (callback) {
                 await callback({
                     text: errorText,

@@ -98,7 +98,7 @@ export const GET_MY_WALLET_INFO: Action = {
      */
     handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
         try {
-            logger.info("start to get my wallet info on the POLKADOT AssetHub");
+            runtime.logger.info("start to get my wallet info on the POLKADOT AssetHub");
             
             // Get the AssetHubService instance
             const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
@@ -113,7 +113,7 @@ export const GET_MY_WALLET_INFO: Action = {
             const decimals = await assethubService.chain.getAssetsDecimals(null);
             
             // Convert balance from raw format to human-readable format
-            const amount = balance / BigInt(10 ** decimals);
+            const amount = (Number(balance) / 10 ** decimals).toString();
             const response = {
                 text: `My wallet address is ${address}, and my balance is ${amount.toString()}`,
                 content: {address: address, balance: balance.toString()},
@@ -121,7 +121,7 @@ export const GET_MY_WALLET_INFO: Action = {
             if (callback) {
                 await callback(response);
             }
-            logger.info(`Get my wallet info on the POLKADOT AssetHub successfully, address: ${address}, balance: ${balance.toString()}`);
+            runtime.logger.info(`Get my wallet info on the POLKADOT AssetHub successfully, address: ${address}, balance: ${balance.toString()}`);
             const result: ActionResult = {
                 success: true,
                 text: response.text,
@@ -136,7 +136,7 @@ export const GET_MY_WALLET_INFO: Action = {
         } catch(e) {
             // Handle errors and notify via callback if available
             const errorMessage = `Failed to get my wallet info on the POLKADOT AssetHub`;
-            logger.error(errorMessage);
+            runtime.logger.error(errorMessage);
             if (callback) {
                 await callback({
                     text: errorMessage,

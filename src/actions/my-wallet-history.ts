@@ -92,7 +92,7 @@ export const MY_WALLET_HISTORY: Action = {
      */
     handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
         try {
-            logger.info("start to get my wallet history on the POLKADOT AssetHub");
+            runtime.logger.info("start to get my wallet history on the POLKADOT AssetHub");
             
             // Get the AssetHubService instance
             const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
@@ -118,7 +118,7 @@ export const MY_WALLET_HISTORY: Action = {
             if (callback) {
                 await callback(response);
             }
-            logger.info(`Get my wallet history on the POLKADOT AssetHub successfully, history: \n ${historyText}`);
+            runtime.logger.info(`Get my wallet history on the POLKADOT AssetHub successfully, history: \n ${historyText}`);
             return {
                 success: true,
                 text: response.text,
@@ -136,7 +136,7 @@ export const MY_WALLET_HISTORY: Action = {
                     content: {error: errorText},
                 });
             }
-            logger.error(errorText);
+            runtime.logger.error(errorText);
             return {
                 success: false,
                 text: errorText,

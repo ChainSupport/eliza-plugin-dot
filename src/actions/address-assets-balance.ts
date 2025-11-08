@@ -172,7 +172,7 @@ export const USER_ASSETS_BALANCE: Action = {
      */
     handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
         try {
-            logger.info("start to get user's or your own DOT or assets balance on the POLKADOT AssetHub");
+            runtime.logger.info("start to get user's or your own DOT or assets balance on the POLKADOT AssetHub");
             
             // Compose prompt from state and template
             const addressAssetsBalancePrompt = composePromptFromState({
@@ -197,7 +197,7 @@ export const USER_ASSETS_BALANCE: Action = {
                         content: {error: errorText},
                     });
                 }
-                logger.warn(errorText);
+                runtime.logger.warn(errorText);
                 return {
                     success: false,
                     text: errorText,
@@ -231,7 +231,7 @@ export const USER_ASSETS_BALANCE: Action = {
             if (callback) {
                 await callback(response);
             }
-            logger.info(`Get ${logOwnerLabel} ${assetLabel} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
+            runtime.logger.info(`Get ${logOwnerLabel} ${assetLabel} Balance on the POLKADOT AssetHub successfully, balance: ${balance.toString()}`);
             return {
                 success: true,
                 text: response.text,
@@ -245,7 +245,7 @@ export const USER_ASSETS_BALANCE: Action = {
 
         } catch (e) {
             const errorText = `Failed to get user's or your own DOT or assets balance on the POLKADOT AssetHub. error: ${e}`;
-            logger.error(errorText);
+            runtime.logger.error(errorText);
             if (callback) {
                 await callback({
                     text: errorText,

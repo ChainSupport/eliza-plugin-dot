@@ -21,6 +21,7 @@ import { SubstrateChain } from './common/substrate-chain';
 import {DEFAULT_ASSET_HUB_RPC_URL, DEFAULT_SUBSCAN_X_API_KEY} from "./constants"
 import {SR25519AES} from "@eliza-dot-aes/sr25519-aes"
 import {SubscanApi} from "./common/subscan-api";
+import { run } from 'node:test';
 
 
 /**
@@ -80,11 +81,11 @@ export class AssetHubService extends Service {
     try {
       if (this.subscanApi == null) {
         this.subscanApi = new SubscanApi("assethub-polkadot", runtime.getSetting("SUBSCAN_X_API_KEY") || DEFAULT_SUBSCAN_X_API_KEY);
-        logger.info("subscanApi initialized");
+        runtime.logger.info("subscanApi initialized");
       }
       if (this.chain == null) {
         const rpcUrl = runtime.getSetting("ASSET_HUB_RPC_URL") || DEFAULT_ASSET_HUB_RPC_URL;
-        logger.info(`ASSET_HUB_RPC_URL: ${rpcUrl}`);
+        runtime.logger.info(`ASSET_HUB_RPC_URL: ${rpcUrl}`);
         const privateKey = runtime.getSetting("ASSET_HUB_PRIVATE_KEY");
         if (privateKey == null) {
           throw new Error("ASSET_HUB_PRIVATE_KEY is required");
@@ -93,20 +94,22 @@ export class AssetHubService extends Service {
         if (this.chain.chainName != AssetHubService.serviceType) {
           throw new Error(`chain name is not ${AssetHubService.serviceType}`);
         }
-        logger.info(`chain initialized, and my wallet address: ${await this.chain.getMyAddress()}`);
+        runtime.logger.info(`chain initialized, and my wallet address: ${await this.chain.getMyAddress()}`);
       }
-      logger.info("Polkadot Asset Hub service started");
+      runtime.logger.info("Polkadot Asset Hub service started");
     } catch (e) {
-      logger.error(`Failed to start Polkadot Asset Hub service: ${e}`);
+      runtime.logger.error(`Failed to start Polkadot Asset Hub service: ${e}`);
     }
     
   }
 
   static async start(runtime: IAgentRuntime): Promise<Service> {
     console.log("start polkadot asset hub service");
+    runtime.logger.info("start polkadot asset hub service");
     const service = new AssetHubService(runtime);
     await service.start(runtime);
     console.log("polkadot asset hub service started");
+    runtime.logger.info("polkadot asset hub service started");
     return service;
   }
 
@@ -119,9 +122,11 @@ export class AssetHubService extends Service {
    */
   static async stop(runtime: IAgentRuntime) {
     console.log("stop polkadot asset hub service");
+    runtime.logger.info("stop polkadot asset hub service");
     const client = runtime.getService(AssetHubService.serviceType);
     if (!client) {
-      logger.error("assethub-polkadot service not found");
+      runtime.logger.error("assethub-polkadot service not found");
+      console.error("assethub-polkadot service not found");
       return;
     }
     await client.stop();
