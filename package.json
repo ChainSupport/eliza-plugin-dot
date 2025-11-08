@@ -1,6 +1,6 @@
 {
   "name": "@chainsupport/eliza-polkadot-assethub",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
