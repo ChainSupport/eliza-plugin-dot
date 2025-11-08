@@ -103,7 +103,7 @@ export const SEND_MESSAGE: Action = {
         "SAY_SOMETHING_TO_SOMEONE",
         "TELL_SOMETHING_TO_SOMEONE_NO_TRANSFER",
     ],
-    description: "Send an encrypted message to other users on the POLKADOT AssetHub",
+    description: "Send an encrypted message to other users on the POLKADOT AssetHub, or tell someone something private with encrypted message",
     /**
      * Validates that the AssetHubService is available in the runtime.
      * 

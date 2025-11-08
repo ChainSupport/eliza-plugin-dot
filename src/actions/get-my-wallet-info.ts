@@ -66,7 +66,7 @@ export const GET_MY_WALLET_INFO: Action = {
         "MY_WALLET_ADDRESS",
         "MY_WALLET_BALANCE",
     ],
-    description: "Get my wallet info on the POLKADOT AssetHub",
+    description: "Get my wallet info on the POLKADOT AssetHub, contains my wallet address and native DOT balance",
     /**
      * Validates that the AssetHubService is available in the runtime.
      * 

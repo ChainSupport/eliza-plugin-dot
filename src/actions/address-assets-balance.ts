@@ -80,7 +80,7 @@ function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content:
  */
 const addressAssetsBalanceTemplate = `
     Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
-    Tip: USDT's assetId is 1984, USDC's assetId is 1337
+    Tip: USDT's assetId is 1984, USDC's assetId is 1337, DOTA's assetId is 18
     Example responses:
     For user's POLKADOT AssetHub assets (tokens) balance:
     \`\`\`json
@@ -117,7 +117,7 @@ const addressAssetsBalanceTemplate = `
     {{recentMessages}}
     Extract the following information about the requested balance:
     - Address (use null for my address)
-    - Asset ID (use null for DOT balance)
+    - Asset ID (use null for DOT balance) , type must be number or null, not string
     `;
 
 /**

@@ -89,7 +89,7 @@ function validateTransferContent(runtime: IAgentRuntime, content: TransferConten
  * - Transfers without memo
  */
 const transferTemplate = `Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
-    Tip: USDT's assetId is 1984, USDC's assetId is 1337
+    Tip: USDT's assetId is 1984, USDC's assetId is 1337, DOTA's assetId is 18
     Example responses:
     Transfer Assets:
     \`\`\`json
@@ -124,9 +124,9 @@ const transferTemplate = `Respond with a JSON markdown block containing only the
     {{recentMessages}}
 
     Extract the following information about the requested transfer:
-    - Asset ID (use null for DOT transfers)
-    - Recipient wallet address
-    - Amount 
+    - Asset ID (use null for DOT transfers) , type must be number or null, not string
+    - Recipient wallet address, type must be string, not null
+    - Amount , type must be number, not string
     - Memo (use null for no memo)
     `;
 
@@ -159,7 +159,7 @@ similes:[
     "TELL_SOMEONE_SOMETHIG_WITH_ASSETS_TRANSFER",
     "SAY_SOMETHING_TO_SOMEONE_WITH_ASSETS_TRANSFER",
     ],
-description: "Transfer My assets or native DOT to other users on the POLKADOT AssetHub",
+description: "Transfer My assets or native DOT to other users on the POLKADOT AssetHub, or send encrypted message to other users with assets transfer",
 /**
  * Validates that the AssetHubService is available in the runtime.
  * 
