@@ -63,17 +63,13 @@ interface TransferContent extends Content {
  * @returns true if the content is valid, false otherwise
  */
 function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): boolean {
-    if (content.assetId !== null && typeof content.assetId != "number") {
-        runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
-        return false;
-    }
 
     if (content.recipient === null || !checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return false;
     }
 
-    if (content.amount === null || typeof content.amount != "number") {
+    if (content.amount === null) {
         runtime.logger.warn(`amount ${content.amount} is not a valid number`);
         return false;
     }

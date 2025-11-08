@@ -62,11 +62,6 @@ function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content:
             return false;
         }
     }
-    if (content.assetId !== null && typeof content.assetId != "number") {
-        runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
-        return false;
-    
-    }
     return true;
 }
 
