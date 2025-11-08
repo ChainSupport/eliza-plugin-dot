@@ -337,6 +337,66 @@ examples: [
             },
         }
     ],
+    [
+        {
+            name: "{{name1}}",
+            content: {
+                text: "Send 1.0 Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe, with memo 'Hello, how are you?'",
+            },
+        },
+        {
+            name: "{{name2}}",
+            content: {
+                text: "Sending Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe now...",
+                actions: ["TRANSFER_ASSETS"]
+            },
+        }
+    ],
+    [
+        {
+            name: "{{name1}}",
+            content: {
+                text: "send 1.0 Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe, and say 'Hello, how are you?'",
+            },
+        },
+        {
+            name: "{{name2}}",
+            content: {
+                text: "Sending Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe now...",
+                actions: ["TRANSFER_ASSETS"]
+            },
+        }
+    ],
+    [
+        {
+            name: "{{name1}}",
+            content: {
+                text: "send 1.0 Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe, and tell him(or her) 'Hello, how are you?'",
+            },
+        },
+        {
+            name: "{{name2}}",
+            content: {
+                text: "Sending Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe now...",
+                actions: ["TRANSFER_ASSETS"]
+            },
+        }
+    ],
+    [
+        {
+            name: "{{name1}}",
+            content: {
+                text: "send 1.0 Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe, and send encrypted message 'Hello, how are you?'",
+            },
+        },
+        {
+            name: "{{name2}}",
+            content: {
+                text: "Sending Asset 1984 to 14NL8ves2Ue59ZNy73GQT4bhFFNJm3M4eA6yoGvjgAPQMvXe now...",
+                actions: ["TRANSFER_ASSETS"]
+            },
+        }
+    ],
 ] as ActionExample[][],
 
 
