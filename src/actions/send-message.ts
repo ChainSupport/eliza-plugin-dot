@@ -72,19 +72,19 @@ const SendMessageContentSchema = z.object({
  * @param content - The SendMessageContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessageContent): boolean {
-    runtime.logger.info(`validateSendMessageContent: ${JSON.stringify(content)}`);
+function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessageContent): [boolean, SendMessageContent | null] {
+    // runtime.logger.info(`validateSendMessageContent: ${JSON.stringify(content)}`);
     const result = SendMessageContentSchema.safeParse(content);
     if (!result.success) {
         runtime.logger.warn(`validateSendMessageContent: ${result.error.message}`);
-        return false;
+        return [false, null];
     }
-    content = result.data as SendMessageContent
+    const validatedContent = result.data as SendMessageContent
     if (!checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
-        return false;
+        return [false, null];
     }
-    return true;
+    return [true, validatedContent];
 }
 
 /**
@@ -167,10 +167,10 @@ export const SEND_MESSAGE: Action = {
         });
         
         // Parse the JSON response from LLM
-        const content = parseJSONObjectFromText(result) as SendMessageContent;
-        
+        const c = parseJSONObjectFromText(result) as SendMessageContent;
+        const content = validateSendMessageContent(runtime, c)[1];
         // Validate the extracted content
-        if (!validateSendMessageContent(runtime, content)) {
+        if (content == null) {
             const errorText = `Invalid recipient '${content.recipient}' or message '${content.message}'`;
             if (callback) {
                 await callback({

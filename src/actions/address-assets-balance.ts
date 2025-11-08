@@ -76,23 +76,23 @@ const AddressAssetsBalanceContentSchema = z.object({
  * @param content - The AddressAssetsBalanceContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content: AddressAssetsBalanceContent): boolean {
-    runtime.logger.info(`validateAddressAssetsBalanceContent: ${JSON.stringify(content)}, address type: ${typeof content.address}, assetId type: ${typeof content.assetId}`);
+function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content: AddressAssetsBalanceContent): [boolean, AddressAssetsBalanceContent | null] {
+    // runtime.logger.info(`validateAddressAssetsBalanceContent: ${JSON.stringify(content)}, address type: ${typeof content.address}, assetId type: ${typeof content.assetId}`);
     const result = AddressAssetsBalanceContentSchema.safeParse(content);
     if (!result.success) {
         runtime.logger.warn(`validateAddressAssetsBalanceContent: ${result.error.message}`);
-        return false;
+        return [false, null];
     }
-    content = result.data as AddressAssetsBalanceContent
+    const validatedContent = result.data as AddressAssetsBalanceContent
     if (content.address != null && !checkAddress(content.address, 0)[0]) {
         runtime.logger.warn(`address ${content.address} is not a valid address`);
-        return false;
+        return [false, null];
     }
     if (content.assetId != null && (typeof content.assetId !== 'number' || content.assetId < 0)) {
         runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
-        return false;
+        return [false, null];
     }
-    return true;
+    return [true, validatedContent];
 }
 
 /**
@@ -216,10 +216,9 @@ export const USER_ASSETS_BALANCE: Action = {
             });
             
             // Parse the JSON response from LLM
-            const content = parseJSONObjectFromText(result) as AddressAssetsBalanceContent;
-            
-            // Validate the extracted content
-            if (!validateAddressAssetsBalanceContent(runtime,content)) {
+            const c = parseJSONObjectFromText(result) as AddressAssetsBalanceContent;
+            const content = validateAddressAssetsBalanceContent(runtime, c)[1];
+            if (content == null) {
                 const errorText = `Invalid address or assetId: ${content.address}, ${content.assetId}`;
                 if (callback) {
                     await callback({

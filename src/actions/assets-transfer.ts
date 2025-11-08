@@ -87,23 +87,23 @@ const TransferContentSchema = z.object({
  * @param content - The TransferContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): boolean {
-    runtime.logger.info(`validateTransferContent: ${JSON.stringify(content)}`);
+function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): [boolean, TransferContent | null] {
+    // runtime.logger.info(`validateTransferContent: ${JSON.stringify(content)}`);
     const result = TransferContentSchema.safeParse(content);
     if (!result.success) {
         runtime.logger.warn(`validateTransferContent: ${result.error.message}`);
-        return false;
+        return [false, null];
     }
-    content = result.data as TransferContent
+    const validatedContent = result.data as TransferContent
     if (!checkAddress(content.recipient, 0)[0]) {
         runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
-        return false;
+        return [false, null];
     }   
     if (content.amount <= 0) {
         runtime.logger.warn(`amount ${content.amount} is not a valid number`);
-        return false;
+        return [false, null];
     }
-    return true;
+    return [true, validatedContent];
 }
 
 /**
@@ -229,11 +229,9 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         });
 
         // Parse the JSON response from LLM
-        const content = parseJSONObjectFromText(result) as TransferContent;
-        
-        // Validate the extracted content
-        if (!validateTransferContent(runtime,content)) {
-            runtime.logger.warn(`validateTransferContent: ${JSON.stringify(content)}, assetId type: ${typeof content.assetId}, recipient type: ${typeof content.recipient}, amount type: ${typeof content.amount}`);
+        const c = parseJSONObjectFromText(result) as TransferContent;
+        const content = validateTransferContent(runtime, c)[1];
+        if (content == null) {
             const errorText = `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`;
             if (callback) {
                 await callback({
