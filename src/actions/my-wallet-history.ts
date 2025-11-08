@@ -109,7 +109,7 @@ export const MY_WALLET_HISTORY: Action = {
             
             // Format history as readable text
             const historyText = history.map((item) => {
-                return `Type: ${item.type}, Sender: ${item.sender}, Recipient: ${item.recipient}, Amount: ${item.amount}, Memo: ${item.memo}, Timestamp: ${item.timestamp}, TxId: ${item.txId}`;
+                return `Type: ${item.type}, Sender: ${item.sender}, Recipient: ${item.recipient}, Token: ${item.tokenSymbol}, Amount: ${item.amount}, Memo: ${item.memo}, Timestamp: ${item.timestamp}, TxId: ${item.txId}`;
             }).join("\n");
             const response = {
                 text: `Get my wallet history on the POLKADOT AssetHub successfully. history: \n ${historyText}`,

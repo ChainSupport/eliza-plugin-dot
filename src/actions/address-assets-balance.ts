@@ -265,7 +265,7 @@ export const USER_ASSETS_BALANCE: Action = {
                 text: response.text,
                 data: {
                     balance: balance.toString(),
-                    address: content.address ?? await assethubService.chain.getMyAddress(),
+                    address: address,
                     assetId: content.assetId,
                     decimals,
                 },
