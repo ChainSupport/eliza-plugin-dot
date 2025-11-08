@@ -57,11 +57,13 @@ interface SendMessageContent extends Content {
  * @param content - The SendMessageContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateSendMessageContent(content: SendMessageContent): boolean {
-    if (content.recipient == null || !checkAddress(content.recipient, 0)[0]) {
+function validateSendMessageContent(runtime: IAgentRuntime, content: SendMessageContent): boolean {
+    if (content.recipient === null || content.recipient === "" || !checkAddress(content.recipient, 0)[0]) {
+        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
         return false;
     }
-    if (content.message == null) {
+    if (content.message === null || content.message === "") {
+        runtime.logger.warn(`message ${content.message} is not a valid message`);
         return false;
     }
     return true;
@@ -150,7 +152,7 @@ export const SEND_MESSAGE: Action = {
         const content = parseJSONObjectFromText(result) as SendMessageContent;
         
         // Validate the extracted content
-        if (!validateSendMessageContent(content)) {
+        if (!validateSendMessageContent(runtime, content)) {
             const errorText = `Invalid recipient '${content.recipient}' or message '${content.message}'`;
             if (callback) {
                 await callback({

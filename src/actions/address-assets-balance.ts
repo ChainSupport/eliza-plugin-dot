@@ -55,12 +55,17 @@ interface AddressAssetsBalanceContent extends Content {
  * @param content - The AddressAssetsBalanceContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateAddressAssetsBalanceContent(content: AddressAssetsBalanceContent): boolean {
-    if (content.address != null) {
-        return checkAddress(content.address, 0)[0];
+function validateAddressAssetsBalanceContent(runtime: IAgentRuntime,    content: AddressAssetsBalanceContent): boolean {
+    if (content.address !== null && content.address !== "") {
+        if (!checkAddress(content.address, 0)[0]) {
+            runtime.logger.warn(`address ${content.address} is not a valid address`);
+            return false;
+        }
     }
-    if (content.assetId != null) {
-        return typeof content.assetId === 'number';
+    if (content.assetId !== null && typeof content.assetId != "number") {
+        runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
+        return false;
+    
     }
     return true;
 }
@@ -189,7 +194,7 @@ export const USER_ASSETS_BALANCE: Action = {
             const content = parseJSONObjectFromText(result) as AddressAssetsBalanceContent;
             
             // Validate the extracted content
-            if (!validateAddressAssetsBalanceContent(content)) {
+            if (!validateAddressAssetsBalanceContent(runtime,content)) {
                 const errorText = `Invalid address or assetId: ${content.address}, ${content.assetId}`;
                 if (callback) {
                     await callback({
@@ -214,7 +219,7 @@ export const USER_ASSETS_BALANCE: Action = {
             // Query balance and convert from raw balance to human-readable format
             // Divide by 10^decimals to get the actual balance value
             const rawBalance = await assethubService.chain.getUserBalance(content.address, content.assetId);
-            const balance = rawBalance / BigInt(10 ** decimals);
+            const balance = (Number(rawBalance) / (10 ** decimals)).toString();
             const targetAddress = content.address ?? await assethubService.chain.getMyAddress();
             const assetLabel = content.assetId == null ? "native DOT" : `asset ${content.assetId}`;
             const ownerLabel = content.address == null ? "Your" : content.address;

@@ -37,6 +37,7 @@ import {
     parseJSONObjectFromText,
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
+import { run } from "node:test";
   
 /**
  * Content interface for asset transfer.
@@ -61,16 +62,23 @@ interface TransferContent extends Content {
  * @param content - The TransferContent object to validate
  * @returns true if the content is valid, false otherwise
  */
-function validateTransferContent(content: TransferContent): boolean {
-    if (content.assetId != null) {
-        return typeof content.assetId == "number"
-    }
-
-    if (content.recipient == null || content.amount == null) {
+function validateTransferContent(runtime: IAgentRuntime, content: TransferContent): boolean {
+    if (content.assetId !== null && typeof content.assetId != "number") {
+        runtime.logger.warn(`assetId ${content.assetId} is not a valid number`);
         return false;
     }
 
-    return checkAddress(content.recipient, 0)[0] && typeof content.amount == "number";
+    if (content.recipient === null || !checkAddress(content.recipient, 0)[0]) {
+        runtime.logger.warn(`recipient ${content.recipient} is not a valid address`);
+        return false;
+    }
+
+    if (content.amount === null || typeof content.amount != "number") {
+        runtime.logger.warn(`amount ${content.amount} is not a valid number`);
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -199,7 +207,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
         const content = parseJSONObjectFromText(result) as TransferContent;
         
         // Validate the extracted content
-        if (!validateTransferContent(content)) {
+        if (!validateTransferContent(runtime,content)) {
             const errorText = `Invalid assetId, recipient, or amount: ${content.assetId}, ${content.recipient}, ${content.amount}`;
             if (callback) {
                 await callback({
