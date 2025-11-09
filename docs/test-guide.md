@@ -1,4 +1,13 @@
 ## Test Guide
+
+### Clone Project
+
+```
+git clone https://github.com/ChainSupport/eliza-plugin-dot.git
+cd eliza-plugin-dot
+git fetch origin m1
+git switch m1
+```
 ### 1. Automated Testing
 #### Install dependencies
 ```
