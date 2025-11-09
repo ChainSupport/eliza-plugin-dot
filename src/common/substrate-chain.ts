@@ -323,10 +323,6 @@ export class SubstrateChain {
      * @returns Promise resolving to EncryptedMemo object, or null if encryption fails or Ethereum chain
      */
     private async encryptMemo(memo: string, to: string, toPublicKey: string = null): Promise<EncryptedMemo> {
-        // 暂时不支持以太坊
-        if (this.isEthereum) {
-            return null;
-        }
         
         if (memo == null) {
             return null;
@@ -349,7 +345,6 @@ export class SubstrateChain {
      * @returns Promise resolving to the decrypted memo string, or empty string if decryption fails
      */
     // private async decryptMemo(memo: EncryptedMemo): Promise<string> {
-    //     // 暂时不支持以太坊
     //     if (this.isEthereum) {
     //         return "";
     //     }
