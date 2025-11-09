@@ -265,7 +265,7 @@ const result = await runtime.executeAction('GET_MY_WALLET_INFO', {});
 
 ## System Requirements
 
-- Node.js 16.x or higher
+- Node.js v23.3.0 or higher
 - TypeScript 5.x or higher
 - Minimum 4GB RAM recommended
 - Stable internet connection
