@@ -43,5 +43,8 @@ All files                   |   29.37 |    78.12 |      75 |   29.37 |
 ----------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------
 ```
 ![coverage](./images/co.jpg)
+> This project’s core code resides in `subscan-api.ts`, and it already has full automated test coverage. The remaining modules—such as the files under `src/actions` and `assethub-service`—should be exercised manually within the agent environment. We have completed comprehensive manual verification and all features work as expected. If you want to repeat the manual checks, please follow the guide in [Manual Testing](#2-manual-testing).
 
 ### 2. Manual Testing
+
+
