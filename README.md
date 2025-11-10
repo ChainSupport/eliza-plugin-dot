@@ -40,7 +40,7 @@ The Polkadot Asset Hub plugin serves as a foundational component of Eliza OS, br
 
 ### Access Control
 
-- **Wallet Management**: Secure wallet key derivation and storage
+- **Wallet Management**: Secure wallet key storage
 - **Private Key Protection**: Secure private key handling with SR25519 encryption
 - **Key Derivation**: Support for SR25519 keypair type
 - **Address Validation**: SS58 format validation for addresses
