@@ -24,16 +24,16 @@ import { TransferDetailWithMemo } from '../src/types';
 
 describe('SubstrateChain', () => {
     const mockRpcUrl = 'https://rpc-asset-hub-polkadot.luckyfriday.io';
-    const alicePrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
-    const bobPrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
+    const ALICE_PRIVATE_KEY = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
+    const BOB_PRIVATE_KEY = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
     const mockNetwork = 'Polkadot Asset Hub';
-    const subscanApiKey = '371616121bcc4d1b8f59d4e2072135e4';
+    const SUBSCAN_API_KEY = '371616121bcc4d1b8f59d4e2072135e4';
     let subscanApi: SubscanApi;
     let cryptMessage: ICryptMessage;
 
     beforeEach(async () => {
-        subscanApi = new SubscanApi(mockNetwork, subscanApiKey);
-        cryptMessage = await SR25519AES.build(alicePrivateKey);
+        subscanApi = new SubscanApi(mockNetwork, SUBSCAN_API_KEY);
+        cryptMessage = await SR25519AES.build(ALICE_PRIVATE_KEY);
         vi.clearAllMocks();
     });
 
@@ -41,7 +41,7 @@ describe('SubstrateChain', () => {
         it('should create and initialize SubstrateChain with all parameters', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
                 subscanApi,
                 cryptMessage
@@ -73,7 +73,7 @@ describe('SubstrateChain', () => {
         it('should create SubstrateChain with minimal parameters (no subscanApi and cryptMessage)', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
                 null,
                 null
@@ -96,7 +96,7 @@ describe('SubstrateChain', () => {
         it('should create SubstrateChain with only rpcUrl and privateKey', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             expect(chain).toBeDefined();
@@ -111,7 +111,7 @@ describe('SubstrateChain', () => {
         it('should initialize native token info correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
                 null,
                 null
@@ -129,7 +129,7 @@ describe('SubstrateChain', () => {
         it('should initialize chain name correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const chainName = chain.getChainName();
@@ -142,7 +142,7 @@ describe('SubstrateChain', () => {
         it('should initialize SS58 format correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const ss58Format = chain.getSs58Format();
@@ -155,7 +155,7 @@ describe('SubstrateChain', () => {
         it('should not be Ethereum chain', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const isEthereum = await chain.isEthereumChain();
@@ -168,7 +168,7 @@ describe('SubstrateChain', () => {
         it('should validate initialization parameters', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
                 subscanApi,
                 cryptMessage
@@ -187,14 +187,14 @@ describe('SubstrateChain', () => {
             const invalidRpcUrl = 'wss://invalid-rpc-url-that-does-not-exist.com/ws';
             
             await expect(
-                SubstrateChain.create(invalidRpcUrl, alicePrivateKey)
+                SubstrateChain.create(invalidRpcUrl, ALICE_PRIVATE_KEY)
             ).rejects.toThrow();
         }, );
 
         it('should handle different keypair types', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519'
             );
 
@@ -209,7 +209,7 @@ describe('SubstrateChain', () => {
         it('should derive address from private key', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const address = await chain.getMyAddress();
@@ -225,7 +225,7 @@ describe('SubstrateChain', () => {
         it('should validate correct Substrate address', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
             // First get a valid address
             const validAddress = await chain.getMyAddress();
@@ -239,7 +239,7 @@ describe('SubstrateChain', () => {
         it('should reject invalid address', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const invalidAddress = 'invalid-address-string';
@@ -255,7 +255,7 @@ describe('SubstrateChain', () => {
         it('should update RPC URL and reconnect to the chain', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const originalRpcUrl = chain.getRpcUrl();
@@ -280,7 +280,7 @@ describe('SubstrateChain', () => {
         it('should maintain chain properties after updating RPC URL', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const originalChainName = chain.getChainName();
@@ -314,7 +314,7 @@ describe('SubstrateChain', () => {
         it('should throw error when updating RPC URL to invalid URL', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
 
             const invalidRpcUrl = 'invalid-rpc-url-that-does-not-exist.com/ws';
@@ -327,7 +327,7 @@ describe('SubstrateChain', () => {
         it('should get public key from address', async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
             const publicKey = await chain.getAddressPublicKey(await chain.getMyAddress());
             console.log("publicKey", publicKey);
@@ -341,7 +341,7 @@ describe('SubstrateChain', () => {
         it('should get my balance for native token', async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
             const balance = await chain.getUserBalance(await chain.getMyAddress());
             const balance2 = await chain.getUserBalance("error" as any);
@@ -354,7 +354,7 @@ describe('SubstrateChain', () => {
         it('should get my balance for asset', async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
             const balance = await chain.getUserBalance(await chain.getMyAddress(), 18);
             console.log("balance", balance);
@@ -364,7 +364,7 @@ describe('SubstrateChain', () => {
         it('should get assets decimals', async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
-                alicePrivateKey
+                ALICE_PRIVATE_KEY
             );
             const decimals = await chain.getAssetsDecimals(18);
             console.log("decimals", decimals);
@@ -382,21 +382,21 @@ describe('SubstrateChain', () => {
         // const subscan = "371616121bcc4d1b8f59d4e2072135e4";
         const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
         it('should transfer DOT with memo', async () => {
-            console.log("alicePrivateKey", alicePrivateKey);
+            console.log("ALICE_PRIVATE_KEY", ALICE_PRIVATE_KEY);
             const aliceChain = await SubstrateChain.create(
                 rpc,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(alicePrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(ALICE_PRIVATE_KEY)
             );
             console.log("aliceChain");
             const bobChain = await SubstrateChain.create(
                 rpc,
-                bobPrivateKey,
+                BOB_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(bobPrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(BOB_PRIVATE_KEY)
             );
             console.log("bobChain");
             const bobAddress = await bobChain.getMyAddress();
@@ -423,17 +423,17 @@ describe('SubstrateChain', () => {
         it('should transfer asset with memo', { timeout: 30000 * 2 * 20 }, async () => {
             const aliceChain = await SubstrateChain.create(
                 rpc,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(alicePrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(ALICE_PRIVATE_KEY)
             );
             const bobChain = await SubstrateChain.create(
                 rpc,
-                bobPrivateKey,
+                BOB_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(bobPrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(BOB_PRIVATE_KEY)
             );
             const bobAddress = await bobChain.getMyAddress();
             console.log("bobAddress", bobAddress);
@@ -456,17 +456,17 @@ describe('SubstrateChain', () => {
         it('should send message to bob', { timeout: 30000 * 2 * 20 }, async () => {
             const aliceChain = await SubstrateChain.create(
                 rpc,
-                alicePrivateKey,
+                ALICE_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(alicePrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(ALICE_PRIVATE_KEY)
             );
             const bobChain = await SubstrateChain.create(
                 rpc,
-                bobPrivateKey,
+                BOB_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(bobPrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(BOB_PRIVATE_KEY)
             );
             const bobAddress = await bobChain.getMyAddress();
             console.log("bobAddress", bobAddress);  
@@ -482,17 +482,17 @@ describe('SubstrateChain', () => {
         it('should get 10 transactions for bob and decrypt them', { timeout: 30000 * 2 * 20 }, async () => {
             const bobChain = await SubstrateChain.create(
                 rpc,
-                bobPrivateKey,
+                BOB_PRIVATE_KEY,
                 'sr25519',
-                new SubscanApi("assethub-polkadot", subscanApiKey),
-                await SR25519AES.build(bobPrivateKey)
+                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+                await SR25519AES.build(BOB_PRIVATE_KEY)
             );
             const bobAddress = await bobChain.getMyAddress();
             if (!bobChain.subscanApi) {
                 throw new Error("subscanApi is not initialized");
             }
             const transactions = await bobChain.subscanApi.addressTransferHistory(bobAddress, undefined, undefined, undefined, 0, 10);
-            const transfer: TransferDetailWithMemo[] = await bobChain.subscanApi.decryptTransfersMemo(transactions, await SR25519AES.build(bobPrivateKey));
+            const transfer: TransferDetailWithMemo[] = await bobChain.subscanApi.decryptTransfersMemo(transactions, await SR25519AES.build(BOB_PRIVATE_KEY));
             for (const tx of transfer) {
                 console.log("tx: ", JSON.stringify(tx));
             }

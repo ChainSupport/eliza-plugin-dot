@@ -20,11 +20,11 @@ import type { TransferDetail, TransferDetailWithMemo } from '../src/types';
 
 describe('SubscanApi', () => {
     const mockNetwork = 'assethub-polkadot';
-    const mockApiKey = '371616121bcc4d1b8f59d4e2072135e4';
+    const SUBSCAN_API_KEY = '371616121bcc4d1b8f59d4e2072135e4';
     let api: SubscanApi;
 
     beforeEach(() => {
-        api = new SubscanApi(mockNetwork, mockApiKey);
+        api = new SubscanApi(mockNetwork, SUBSCAN_API_KEY);
         vi.clearAllMocks();
     });
 
@@ -35,7 +35,7 @@ describe('SubscanApi', () => {
 
         it('should initialize with correct headers', () => {
             expect(api.headers.get('Content-Type')).toBe('application/json');
-            expect(api.headers.get('x-api-key')).toBe(mockApiKey);
+            expect(api.headers.get('x-api-key')).toBe(SUBSCAN_API_KEY);
         });
 
         it('should use default API key when not provided', () => {
