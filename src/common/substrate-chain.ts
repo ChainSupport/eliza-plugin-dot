@@ -308,6 +308,7 @@ export class SubstrateChain {
             return transfer[0];
 
         } catch (e) {
+            console.log("Failed to getTransactionMemo: ", e);
             throw Error(`Failed to getTransactionMemo: ${e}`);
         }
     }

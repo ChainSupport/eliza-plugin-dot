@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
 import { SubstrateChain } from '../src/common/substrate-chain';
 import { SubscanApi } from '../src/common/subscan-api';
 import { SR25519AES } from '@eliza-dot-aes/sr25519-aes';
@@ -35,40 +35,50 @@ describe('SubstrateChain', () => {
     console.log("SUBSCAN_API_KEY", SUBSCAN_API_KEY);
     let subscanApi: SubscanApi;
     let cryptMessage: ICryptMessage;
-
-    beforeEach(async () => {
+    let AliceSubstrateChain: SubstrateChain;
+    let BobSubstrateChain: SubstrateChain;
+    beforeAll(async () => {
+        AliceSubstrateChain = await SubstrateChain.create(
+            ASSETHUB_RPC_URL,
+            ALICE_PRIVATE_KEY,
+            'sr25519',
+            new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+            await SR25519AES.build(ALICE_PRIVATE_KEY)
+        );
+        console.log("init Alice chain")
+        BobSubstrateChain = await SubstrateChain.create(
+            ASSETHUB_RPC_URL,
+            BOB_PRIVATE_KEY,
+            'sr25519',
+            new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
+            await SR25519AES.build(BOB_PRIVATE_KEY)
+        );
+        console.log("init Bob chain")
         subscanApi = new SubscanApi(mockNetwork, SUBSCAN_API_KEY);
+        console.log("init subscanApi")
         cryptMessage = await SR25519AES.build(ALICE_PRIVATE_KEY);
-        vi.clearAllMocks();
+        console.log("init cryptMessage")
+
     });
 
     describe('create', () => {
         it('should create and initialize SubstrateChain with all parameters', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY,
-                'sr25519',
-                subscanApi,
-                cryptMessage
-            );
 
-            expect(chain).toBeDefined();
-            const blockHeight = await chain.getLatestBlockHeight();
+            expect(AliceSubstrateChain).toBeDefined();
+            const blockHeight = await AliceSubstrateChain.getLatestBlockHeight();
             expect(blockHeight).toBeGreaterThan(0);
-            expect(chain.api).toBeDefined();
-            expect(chain.getRpcUrl()).toBe(ASSETHUB_RPC_URL);
-            expect(chain.keyPairType).toBe('sr25519');
-            expect(chain.subscanApi).toBe(subscanApi);
+            expect(AliceSubstrateChain.api).toBeDefined();
+            expect(AliceSubstrateChain.getRpcUrl()).toBe(ASSETHUB_RPC_URL);
+            expect(AliceSubstrateChain.keyPairType).toBe('sr25519');
+            // expect(AliceSubstrateChain.subscanApi).toBe(subscanApi);
             
             // Verify chain properties are initialized
-            const chainName = chain.getChainName();
+            const chainName = AliceSubstrateChain.getChainName();
             expect(chainName).toBe(mockNetwork);
             
-            const ss58Format = chain.getSs58Format();
+            const ss58Format = AliceSubstrateChain.getSs58Format();
             expect(ss58Format).toBe(0);
             
-            // Cleanup
-            // await chain.api.disconnect();
         }, ); // 30 seconds timeout for real RPC connection
 
         it('should create SubstrateChain with minimal parameters (no subscanApi and cryptMessage)', { timeout: 300000 }, async () => {
@@ -89,9 +99,6 @@ describe('SubstrateChain', () => {
             // Verify chain properties are initialized
             const chainName = chain.getChainName();
             expect(chainName).toBe(mockNetwork);
-            
-            // Cleanup
-            // await chain.api.disconnect();
         });
 
         it('should create SubstrateChain with only rpcUrl and privateKey', { timeout: 300000 }, async () => {
@@ -128,12 +135,8 @@ describe('SubstrateChain', () => {
         }, );
 
         it('should initialize chain name correctly', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
 
-            const chainName = chain.getChainName();
+            const chainName = AliceSubstrateChain.getChainName();
             expect(chainName).toBe(mockNetwork);
             
             // Cleanup
@@ -141,25 +144,13 @@ describe('SubstrateChain', () => {
         }, );
 
         it('should initialize SS58 format correctly', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
 
-            const ss58Format = chain.getSs58Format();
+            const ss58Format = AliceSubstrateChain.getSs58Format();
             expect(ss58Format).toBe(0);
-            
-            // Cleanup
-            // await chain.api.disconnect();
         }, );
 
         it('should not be Ethereum chain', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-
-            const isEthereum = await chain.isEthereumChain();
+            const isEthereum = await AliceSubstrateChain.isEthereumChain();
             expect(isEthereum).toBe(false);
             
             // Cleanup
@@ -167,21 +158,11 @@ describe('SubstrateChain', () => {
         }, );
 
         it('should validate initialization parameters', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY,
-                'sr25519',
-                subscanApi,
-                cryptMessage
-            );
 
             // Verify all initialization parameters are set correctly
-            expect(chain.getRpcUrl()).toBe(ASSETHUB_RPC_URL);
-            expect(chain.keyPairType).toBe('sr25519');
-            expect(chain.subscanApi).toBe(subscanApi);
-            
-            // Cleanup
-            // await chain.api.disconnect();
+            expect(AliceSubstrateChain.getRpcUrl()).toBe(ASSETHUB_RPC_URL);
+            expect(AliceSubstrateChain.keyPairType).toBe('sr25519');
+            // expect(AliceSubstrateChain.subscanApi).toBe(subscanApi);
         }, );
 
         it('should throw error when RPC URL is invalid', { timeout: 300000 }, async () => {
@@ -193,27 +174,16 @@ describe('SubstrateChain', () => {
         }, );
 
         it('should handle different keypair types', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY,
-                'sr25519'
-            );
 
-            expect(chain.keyPairType).toBe('sr25519');
+            expect(AliceSubstrateChain.keyPairType).toBe('sr25519');
             
-            // Cleanup
-            await chain.api.disconnect();
         }, );
     });
 
     describe('getMyAddress', () => {
         it('should derive address from private key', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
 
-            const address = await chain.getMyAddress();
+            const address = await AliceSubstrateChain.getMyAddress();
             expect(address).toBeTruthy();
             expect(typeof address).toBe('string');
             expect(address.length).toBeGreaterThan(0);
@@ -224,31 +194,19 @@ describe('SubstrateChain', () => {
 
     describe('validateAddress', () => {
         it('should validate correct Substrate address', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
             // First get a valid address
-            const validAddress = await chain.getMyAddress();
-            const isValid = chain.validateAddress(validAddress);
+            const validAddress = await AliceSubstrateChain.getMyAddress();
+            const isValid = AliceSubstrateChain.validateAddress(validAddress);
             expect(isValid).toBe(true);
             
             // Cleanup
-            await chain.api.disconnect();
+            await AliceSubstrateChain.api.disconnect();
         }, );
 
         it('should reject invalid address', { timeout: 300000 }, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-
             const invalidAddress = 'invalid-address-string';
-            const isValid = chain.validateAddress(invalidAddress);
+            const isValid = AliceSubstrateChain.validateAddress(invalidAddress);
             expect(isValid).toBe(false);
-            
-            // Cleanup
-            await chain.api.disconnect();
         }, );
     });
 
@@ -326,26 +284,19 @@ describe('SubstrateChain', () => {
     // getAddressPublicKey
     describe('getAddressPublicKey', {timeout: 300000}, () => {
         it('should get public key from address', async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-            const publicKey = await chain.getAddressPublicKey(await chain.getMyAddress());
+            const publicKey = await AliceSubstrateChain.getAddressPublicKey(await AliceSubstrateChain.getMyAddress());
             console.log("publicKey", publicKey);
 
-            await expect(chain.getAddressPublicKey("error" as any)).rejects.toThrow();
+            await expect(AliceSubstrateChain.getAddressPublicKey("error" as any)).rejects.toThrow();
         });
     }, );
 
 
     describe('getMyBalance', () => {
         it('should get my balance for native token', {timeout: 300000}, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-            const balance = await chain.getUserBalance(await chain.getMyAddress());
-            const balance2 = await chain.getUserBalance("error" as any);
+            
+            const balance = await AliceSubstrateChain.getUserBalance(await AliceSubstrateChain.getMyAddress());
+            const balance2 = await AliceSubstrateChain.getUserBalance("error" as any);
             console.log("balance2", balance2);
             expect(balance2).toBe(BigInt(0));
             console.log("balance", balance);
@@ -353,146 +304,93 @@ describe('SubstrateChain', () => {
         });
 
         it('should get my balance for asset', {timeout: 300000}, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-            const balance = await chain.getUserBalance(await chain.getMyAddress(), 18);
+            const balance = await AliceSubstrateChain.getUserBalance(await AliceSubstrateChain.getMyAddress(), 18);
             console.log("balance", balance);
             expect(balance).toBeGreaterThan(BigInt(0));
         });
 
         it('should get assets decimals', {timeout: 300000}, async () => {
-            const chain = await SubstrateChain.create(
-                ASSETHUB_RPC_URL,
-                ALICE_PRIVATE_KEY
-            );
-            const decimals = await chain.getAssetsDecimals(18);
+            
+            const decimals = await AliceSubstrateChain.getAssetsDecimals(18);
             console.log("decimals", decimals);
             expect(decimals).toBe(4)
             
-            const decimals2 = await chain.getAssetsDecimals(null);
+            const decimals2 = await AliceSubstrateChain.getAssetsDecimals(null);
             console.log("decimals2", decimals2);
             expect(decimals2).toBe(10);
 
-            await expect(chain.getAssetsDecimals("error" as any)).rejects.toThrow();
+            await expect(AliceSubstrateChain.getAssetsDecimals("error" as any)).rejects.toThrow();
         });
     });
 
     describe('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
-        const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
+        // const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
         it('should transfer DOT with memo', async () => {
-            console.log("ALICE_PRIVATE_KEY", ALICE_PRIVATE_KEY);
-            const aliceChain = await SubstrateChain.create(
-                rpc,
-                ALICE_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(ALICE_PRIVATE_KEY)
-            );
-            console.log("aliceChain");
-            const bobChain = await SubstrateChain.create(
-                rpc,
-                BOB_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(BOB_PRIVATE_KEY)
-            );
-            console.log("bobChain");
-            const bobAddress = await bobChain.getMyAddress();
+            const bobAddress = await BobSubstrateChain.getMyAddress();
             console.log("bobAddress", bobAddress);
-            await expect(aliceChain.transferWithMemo("invalid-address-string", BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT")).rejects.toThrow();
-            const txHash = await aliceChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
+            const aliceAddress = await AliceSubstrateChain.getMyAddress();
+            console.log("aliceAddress", aliceAddress);
+            await expect(AliceSubstrateChain.transferWithMemo("invalid-address-string", BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT")).rejects.toThrow();
+            const txHash = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
+            const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
             console.log("memo", memo.memo);
-            const bobMemo: TransferDetailWithMemo = await bobChain.getTransferMemo(txHash);
+            const bobMemo: TransferDetailWithMemo = await BobSubstrateChain.getTransferMemo(txHash);
             console.log("bobMemo", JSON.stringify(bobMemo));
             expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
-            const txHash2 = await aliceChain.transferWithMemo(bobAddress, BigInt(120000));
+            const txHash2 = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000));
             console.log("txHash2", txHash2);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             expect(txHash2).toBeTruthy();
-            const memo2: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash2);
+            const memo2: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash2);
             console.log("memo2", memo2);
             expect(memo2.memo).toBe(undefined);
         }, );
 
         it('should transfer asset with memo', { timeout: 30000 * 2 * 20 }, async () => {
-            const aliceChain = await SubstrateChain.create(
-                rpc,
-                ALICE_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(ALICE_PRIVATE_KEY)
-            );
-            const bobChain = await SubstrateChain.create(
-                rpc,
-                BOB_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(BOB_PRIVATE_KEY)
-            );
-            const bobAddress = await bobChain.getMyAddress();
+            const bobAddress = await BobSubstrateChain.getMyAddress();
             console.log("bobAddress", bobAddress);
-            await expect(aliceChain.assetsTransferWithMemo("invalid-address-string", BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets")).rejects.toThrow();
-            const txHash = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets");
+            const aliceAddress = await AliceSubstrateChain.getMyAddress();
+            console.log("aliceAddress", aliceAddress);
+            await expect(AliceSubstrateChain.assetsTransferWithMemo("invalid-address-string", BigInt(1000), 18, "hello bob, i am alice, i am sending you 0.1 dota")).rejects.toThrow();
+            const txHash = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18, "hello bob, i am alice, i am sending you 0.1 dota");
             console.log("txHash", txHash);
-            await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
-            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
+            await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
+            const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
             console.log("memo", memo.memo);
-            expect(memo.memo).toBe("hello bob, i am alice, i am sending you 18 assets");
-            const txHash2 = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18);
+            expect(memo.memo).toBe("hello bob, i am alice, i am sending you 0.1 dota");
+            const txHash2 = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18);
             console.log("txHash2", txHash2);
-            await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
+            await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
             expect(txHash2).toBeTruthy();
-            const memo2: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash2);
+            const memo2: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash2);
             console.log("memo2", memo2);
             expect(memo2.memo).toBe(undefined);
         }, );
 
         it('should send message to bob', { timeout: 30000 * 2 * 20 }, async () => {
-            const aliceChain = await SubstrateChain.create(
-                rpc,
-                ALICE_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(ALICE_PRIVATE_KEY)
-            );
-            const bobChain = await SubstrateChain.create(
-                rpc,
-                BOB_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(BOB_PRIVATE_KEY)
-            );
-            const bobAddress = await bobChain.getMyAddress();
-            console.log("bobAddress", bobAddress);  
-            await expect(aliceChain.sendMessage(bobAddress, "")).rejects.toThrow();
-            const txHash = await aliceChain.sendMessage(bobAddress, "hello bob, i am alice, i am sending you a message");
+            const bobAddress = await BobSubstrateChain.getMyAddress();
+            console.log("bobAddress", bobAddress);
+            const aliceAddress = await AliceSubstrateChain.getMyAddress(); 
+            await expect(AliceSubstrateChain.sendMessage(bobAddress, "")).rejects.toThrow();
+            const txHash = await AliceSubstrateChain.sendMessage(bobAddress, "hello bob, i am alice, i am sending you a message");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
+            const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
             console.log("memo", memo.memo);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you a message");
         }, );
 
         it('should get 10 transactions for bob and decrypt them', { timeout: 30000 * 2 * 20 }, async () => {
-            const bobChain = await SubstrateChain.create(
-                rpc,
-                BOB_PRIVATE_KEY,
-                'sr25519',
-                new SubscanApi("assethub-polkadot", SUBSCAN_API_KEY),
-                await SR25519AES.build(BOB_PRIVATE_KEY)
-            );
-            const bobAddress = await bobChain.getMyAddress();
-            if (!bobChain.subscanApi) {
+           
+            const bobAddress = await BobSubstrateChain.getMyAddress();
+            if (!BobSubstrateChain.subscanApi) {
                 throw new Error("subscanApi is not initialized");
             }
-            const transactions = await bobChain.subscanApi.addressTransferHistory(bobAddress, undefined, undefined, undefined, 0, 10);
-            const transfer: TransferDetailWithMemo[] = await bobChain.subscanApi.decryptTransfersMemo(transactions, await SR25519AES.build(BOB_PRIVATE_KEY));
+            const transactions = await BobSubstrateChain.subscanApi.addressTransferHistory(bobAddress, undefined, undefined, undefined, 0, 10);
+            const transfer: TransferDetailWithMemo[] = await BobSubstrateChain.subscanApi.decryptTransfersMemo(transactions, await SR25519AES.build(BOB_PRIVATE_KEY));
             for (const tx of transfer) {
                 console.log("tx: ", JSON.stringify(tx));
             }

@@ -14,6 +14,14 @@ git switch m1
 pnpm install
 ```
 
+### Environment Configuration
+
+```
+cp vitest.env.example vitest.env 
+```
+> You can use my configuration (strongly recommended to use my configuration directly, so you don't need to transfer DOT and DOTA to these two accounts, as they currently have sufficient balance for testing), or you can modify it and use your own. Note that Alice and Bob accounts should have DOT or DOTA balance, which are used for Native DOT and Assets transfer testing respectively.
+
+
 #### Run test cases and generate coverage report
 ```
 pnpm run coverage
