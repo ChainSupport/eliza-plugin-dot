@@ -410,10 +410,10 @@ describe('SubstrateChain', () => {
             const txHash = await aliceChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo("0xecc6eb0a69067377ee84de944accc9bc2c54f2cf104f1fdb3261b114f9b115ff");
+            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you a message");
             console.log("memo", memo.memo);
-            const bobMemo: TransferDetailWithMemo = await bobChain.getTransferMemo("0xecc6eb0a69067377ee84de944accc9bc2c54f2cf104f1fdb3261b114f9b115ff");
+            const bobMemo: TransferDetailWithMemo = await bobChain.getTransferMemo(txHash);
             console.log("bobMemo", JSON.stringify(bobMemo));
             expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you a message");
             const txHash2 = await aliceChain.transferWithMemo(bobAddress, BigInt(120000));
@@ -446,7 +446,7 @@ describe('SubstrateChain', () => {
             const txHash = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets");
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo("0xb3519bf43dbec08ef7cf5a493e5d3701cfc9ec6801f7a87889e3e3fd3a3507f4");
+            const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
             console.log("memo", memo.memo);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you 18 assets");
             const txHash2 = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18);
