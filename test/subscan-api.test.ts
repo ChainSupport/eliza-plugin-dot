@@ -17,7 +17,6 @@
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
 import { SubscanApi } from '../src/common/subscan-api';
 import type { TransferDetail, TransferDetailWithMemo } from '../src/types';
-import { aP } from 'vitest/dist/reporters-w_64AS5f.js';
 
 describe('SubscanApi', () => {
     const mockNetwork = 'assethub-polkadot';
@@ -45,17 +44,17 @@ describe('SubscanApi', () => {
         });
     });
 
-    describe('getExtrinsicIndexByHash', () => {
+    describe('getExtrinsicIndexByHash', {timeout: 10000}, () => {
         it('should convert hash to extrinsic index', async () => {
             const mockHash = '0x3ff7b567380dcef6180b4b4db5bdb94cd4cefbef21d650cb5a0b7a96ed4d61c0';
             const mockExtrinsicIndex = '9602102-2';
             const result = await api.getExtrinsicIndexByHash(mockHash);
 
             expect(result).toBe(mockExtrinsicIndex);
-        }, {timeout: 10000});
+        }, );
     });
 
-    describe('getMemoByTransferExtrinsics', () => {
+    describe('getMemoByTransferExtrinsics', {timeout: 10000}, () => {
         it('should extract memo from remark transaction', async () => {
             const mockExtrinsicIndices = ["9602102-2"];
             const mockMemo = '{"e":"3hwdQ1gBP8xMQSC+Kto/5AnQFpk8D4jfXBlWuztZfxxMxbcZ+ogl0Ld/mpkMWEv/XK138bUq8RU/Q9KHyqxm8R4lbg/wG0rfPE4t9mreg0vdkCoEs4+icbBPsHclURZ+TKfB/sC+X1rRmwU/yXaPKA==","t":"sr25519","to":"15DBKxnn69eo4pYZQbD8geFXFQDC2qC51qhvBEKgEYviahit"}';
@@ -67,40 +66,40 @@ describe('SubscanApi', () => {
             // expect(result).toHaveLength(1);
             expect(result[0].extrinsic_index).toBe('9602102-2');
             expect(result[0].memo).toBe(mockMemo);
-        }, {timeout: 10000});
+        }, );
 
-        it('should extract memo from remarkWithEvent transaction', async () => {
+        it('should extract memo from remarkWithEvent transaction', {timeout: 10000}, async () => {
             const mockExtrinsicIndices = ["10230245-2"];
             const mockMemo = '{"e":"3hwdQ1gBP8xMQSC+Kto/5AnQFpk8D4jfXBlWuztZfxxMxbcZ+ogl0Ld/mpkMWEv/XK138bUq8RU/Q9KHyqxm8R4lbg/wG0rfPE4t9mreg0vdkCoEs4+icbBPsHclURZ+TKfB/sC+X1rRmwU/yXaPKA==","t":"sr25519","to":"15DBKxnn69eo4pYZQbD8geFXFQDC2qC51qhvBEKgEYviahit"}';
 
             const result = await (api as any).getMemoByTransferExtrinsics(mockExtrinsicIndices);
             expect(result[0].memo).toBe(mockMemo);
-        }, {timeout: 10000});
+        }, );
 
-        it('should return undefined memo when no remark found', async () => {
+        it('should return undefined memo when no remark found', {timeout: 10000}, async () => {
             const mockExtrinsicIndices = ['10229852-2'];
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
             expect(result[0].memo).toBeUndefined();
-        }, {timeout: 10000});
+        }, );
 
-        it('should return undefined memo when params structure is different', async () => {
+        it('should return undefined memo when params structure is different', {timeout: 10000}, async () => {
             const mockExtrinsicIndices = ['10230310-2'];
 
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
             // expect(result).toHaveLength(1);
             expect(result[0].memo).toBeUndefined();
-        }), {timeout: 10000};
+        }, );
 
-        it('should handle batch of extrinsic indices', async () => {
+        it('should handle batch of extrinsic indices', {timeout: 10000}, async () => {
             const mockExtrinsicIndices = ['10230245-2', '9602102-2'];
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
             expect(result).toHaveLength(2);
         });
-    }, {timeout: 10000});
+    }, );
 
-    describe('addressTransferHistory', () => {
+    describe('addressTransferHistory', {timeout: 10000}, () => {
         it('should fetch transfer history for an address', async () => {
             const mockAddress = '13GKHvBFjWuVjezV8cG6DMoK2FftY4awXXqKdunApnJGbvwd';
 
@@ -109,15 +108,15 @@ describe('SubscanApi', () => {
             await expect(api.addressTransferHistory("0xaw")).rejects.toThrow();
         });
 
-        it('should fetch transfer history by extrinsic index', async () => {
+        it('should fetch transfer history by extrinsic index', {timeout: 10000}, async () => {
             const mockExtrinsicIndex = '10230478-2';
             const result = await api.addressTransferHistory(null, mockExtrinsicIndex);
 
             expect(result).toHaveLength(1);
             expect(result[0].extrinsic_index).toBe(mockExtrinsicIndex);
-        }, {timeout: 10000});
+        }, );
 
-    describe('getTransferByHash', () => {
+    describe('getTransferByHash', {timeout: 10000}, () => {
         it('should retrieve transfer details by hash', async () => {
             const mockHash = '0xa09de785bc38e5650553383067b8cb910c021645e50058b1077073ac9166e3d2';
             const mockExtrinsicIndex = '10230478-2';
@@ -128,7 +127,7 @@ describe('SubscanApi', () => {
             expect(result!.extrinsic_index).toBe(mockExtrinsicIndex);
             await expect(api.getTransferByHash("0xaw")).rejects.toThrow();
         });
-    }, {timeout: 10000});
+    }, );
 
-    }, {timeout: 10000});
+    },);
 });

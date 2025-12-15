@@ -42,10 +42,10 @@
   "description": "Core Polkadot Asset Hub blockchain plugin for Eliza OS that provides essential services and actions for asset operations, transfers, and encrypted messaging on the Polkadot ecosystem.",
   "devDependencies": {
     "@types/node": "^24.0.1",
-    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/coverage-v8": "^4.0.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "vitest": "^1.6.1"
+    "vitest": "^4.0.15"
   },
   "dependencies": {
     "@eliza-dot-aes/common": "^1.0.7",

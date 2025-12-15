@@ -38,7 +38,7 @@ describe('SubstrateChain', () => {
     });
 
     describe('create', () => {
-        it('should create and initialize SubstrateChain with all parameters', async () => {
+        it('should create and initialize SubstrateChain with all parameters', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey,
@@ -68,9 +68,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 }); // 30 seconds timeout for real RPC connection
+        }, ); // 30 seconds timeout for real RPC connection
 
-        it('should create SubstrateChain with minimal parameters (no subscanApi and cryptMessage)', async () => {
+        it('should create SubstrateChain with minimal parameters (no subscanApi and cryptMessage)', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey,
@@ -91,9 +91,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        });
 
-        it('should create SubstrateChain with only rpcUrl and privateKey', async () => {
+        it('should create SubstrateChain with only rpcUrl and privateKey', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -106,9 +106,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should initialize native token info correctly', async () => {
+        it('should initialize native token info correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey,
@@ -124,9 +124,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should initialize chain name correctly', async () => {
+        it('should initialize chain name correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -137,9 +137,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should initialize SS58 format correctly', async () => {
+        it('should initialize SS58 format correctly', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -150,9 +150,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should not be Ethereum chain', async () => {
+        it('should not be Ethereum chain', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -163,9 +163,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should validate initialization parameters', async () => {
+        it('should validate initialization parameters', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey,
@@ -181,17 +181,17 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should throw error when RPC URL is invalid', async () => {
+        it('should throw error when RPC URL is invalid', { timeout: 300000 }, async () => {
             const invalidRpcUrl = 'wss://invalid-rpc-url-that-does-not-exist.com/ws';
             
             await expect(
                 SubstrateChain.create(invalidRpcUrl, mockPrivateKey)
             ).rejects.toThrow();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should handle different keypair types', async () => {
+        it('should handle different keypair types', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey,
@@ -202,11 +202,11 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
     });
 
     describe('getMyAddress', () => {
-        it('should derive address from private key', async () => {
+        it('should derive address from private key', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -221,11 +221,11 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             // await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
     });
 
     describe('validateAddress', () => {
-        it('should validate correct Substrate address', async () => {
+        it('should validate correct Substrate address', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -237,9 +237,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
 
-        it('should reject invalid address', async () => {
+        it('should reject invalid address', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -251,11 +251,11 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 30000 });
+        }, );
     });
 
     describe('updateRpcUrl', () => {
-        it('should update RPC URL and reconnect to the chain', async () => {
+        it('should update RPC URL and reconnect to the chain', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -278,9 +278,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 300000 });
+        }, );
 
-        it('should maintain chain properties after updating RPC URL', async () => {
+        it('should maintain chain properties after updating RPC URL', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -312,9 +312,9 @@ describe('SubstrateChain', () => {
             
             // Cleanup
             await chain.api.disconnect();
-        }, { timeout: 1000000 });
+        }, );
 
-        it('should throw error when updating RPC URL to invalid URL', async () => {
+        it('should throw error when updating RPC URL to invalid URL', { timeout: 300000 }, async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
                 mockPrivateKey
@@ -322,11 +322,11 @@ describe('SubstrateChain', () => {
 
             const invalidRpcUrl = 'invalid-rpc-url-that-does-not-exist.com/ws';
             await expect(chain.updateRpcUrl(invalidRpcUrl)).rejects.toThrow();
-        }, { timeout: 30000 });
+        }, );
     });
 
     // getAddressPublicKey
-    describe('getAddressPublicKey', () => {
+    describe('getAddressPublicKey', {timeout: 300000}, () => {
         it('should get public key from address', async () => {
             const chain = await SubstrateChain.create(
                 mockRpcUrl,
@@ -337,7 +337,7 @@ describe('SubstrateChain', () => {
 
             await expect(chain.getAddressPublicKey("error" as any)).rejects.toThrow();
         });
-    }, { timeout: 30000 });
+    }, );
 
 
     describe('getMyBalance', () => {
@@ -381,7 +381,7 @@ describe('SubstrateChain', () => {
         });
     });
 
-    describe.skip('transferWithMemo', () => {
+    describe.skip('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
         const alicePrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
         const bobPrivateKey = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
         const subscan = "371616121bcc4d1b8f59d4e2072135e4";
@@ -423,9 +423,9 @@ describe('SubstrateChain', () => {
             const memo2: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash2);
             console.log("memo2", memo2);
             expect(memo2.memo).toBe(undefined);
-        }, { timeout: 30000 * 2 * 20 });
+        }, );
 
-        it('should transfer asset with memo', async () => {
+        it('should transfer asset with memo', { timeout: 30000 * 2 * 20 }, async () => {
             const aliceChain = await SubstrateChain.create(
                 rpc,
                 alicePrivateKey,
@@ -456,9 +456,9 @@ describe('SubstrateChain', () => {
             const memo2: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash2);
             console.log("memo2", memo2);
             expect(memo2.memo).toBe(undefined);
-        }, { timeout: 30000 * 2 * 20 });
+        }, );
 
-        it('should send message to bob', async () => {
+        it('should send message to bob', { timeout: 30000 * 2 * 20 }, async () => {
             const aliceChain = await SubstrateChain.create(
                 rpc,
                 alicePrivateKey,
@@ -482,9 +482,9 @@ describe('SubstrateChain', () => {
             const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
             console.log("memo", memo.memo);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you a message");
-        }, { timeout: 30000 * 2 * 20 });
+        }, );
 
-        it('should get 10 transactions for bob and decrypt them', async () => {
+        it('should get 10 transactions for bob and decrypt them', { timeout: 30000 * 2 * 20 }, async () => {
             const bobChain = await SubstrateChain.create(
                 rpc,
                 bobPrivateKey,
@@ -501,7 +501,7 @@ describe('SubstrateChain', () => {
             for (const tx of transfer) {
                 console.log("tx: ", JSON.stringify(tx));
             }
-        }, { timeout: 30000 * 2 * 20 });
+        }, );
     });
 
 
