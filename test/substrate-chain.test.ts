@@ -19,15 +19,20 @@ import { SubstrateChain } from '../src/common/substrate-chain';
 import { SubscanApi } from '../src/common/subscan-api';
 import { SR25519AES } from '@eliza-dot-aes/sr25519-aes';
 import type { ICryptMessage } from '@eliza-dot-aes/common';
-import { DEFAULT_ASSET_HUB_RPC_URL} from '../src/constants';
+import { DEFAULT_ASSET_HUB_RPC_URL, DEFAULT_SUBSCAN_X_API_KEY} from '../src/constants';
 import { TransferDetailWithMemo } from '../src/types';
+import config from "../vitest.config"
 
 describe('SubstrateChain', () => {
-    const ASSETHUB_RPC_URL = 'https://rpc-asset-hub-polkadot.luckyfriday.io';
-    const ALICE_PRIVATE_KEY = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c451";
-    const BOB_PRIVATE_KEY = "0x139ace2d79edcd1af5f5449e784e48b147bdc0f22598fbb0fe3c3f0e02a5c452";
+    let ASSETHUB_RPC_URL = config?.test?.env?.ASSETHUB_RPC_URL || DEFAULT_ASSET_HUB_RPC_URL;
+    console.log("ASSETHUB_RPC_URL", ASSETHUB_RPC_URL);
+    const ALICE_PRIVATE_KEY = config?.test?.env?.ALICE_PRIVATE_KEY || "";
+    console.log("ALICE_PRIVATE_KEY", ALICE_PRIVATE_KEY);
+    const BOB_PRIVATE_KEY = config?.test?.env?.BOB_PRIVATE_KEY || "";
+    console.log("BOB_PRIVATE_KEY", BOB_PRIVATE_KEY);
     const mockNetwork = 'Polkadot Asset Hub';
-    const SUBSCAN_API_KEY = '371616121bcc4d1b8f59d4e2072135e4';
+    const SUBSCAN_API_KEY = config?.test?.env?.SUBSCAN_API_KEY || DEFAULT_SUBSCAN_X_API_KEY;
+    console.log("SUBSCAN_API_KEY", SUBSCAN_API_KEY);
     let subscanApi: SubscanApi;
     let cryptMessage: ICryptMessage;
 
@@ -338,7 +343,7 @@ describe('SubstrateChain', () => {
 
 
     describe('getMyBalance', () => {
-        it('should get my balance for native token', async () => {
+        it('should get my balance for native token', {timeout: 300000}, async () => {
             const chain = await SubstrateChain.create(
                 ASSETHUB_RPC_URL,
                 ALICE_PRIVATE_KEY
@@ -351,7 +356,7 @@ describe('SubstrateChain', () => {
             expect(balance).toBeGreaterThan(0);
         });
 
-        it('should get my balance for asset', async () => {
+        it('should get my balance for asset', {timeout: 300000}, async () => {
             const chain = await SubstrateChain.create(
                 ASSETHUB_RPC_URL,
                 ALICE_PRIVATE_KEY
@@ -361,7 +366,7 @@ describe('SubstrateChain', () => {
             expect(balance).toBeGreaterThan(BigInt(0));
         });
 
-        it('should get assets decimals', async () => {
+        it('should get assets decimals', {timeout: 300000}, async () => {
             const chain = await SubstrateChain.create(
                 ASSETHUB_RPC_URL,
                 ALICE_PRIVATE_KEY

@@ -43,6 +43,7 @@
   "devDependencies": {
     "@types/node": "^24.0.1",
     "@vitest/coverage-v8": "^4.0.15",
+    "dotenv": "^17.2.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vitest": "^4.0.15"
@@ -83,9 +84,10 @@
       },
       "SUBSCAN_X_API_KEY": {
         "type": "string",
-        "description": "The API key of the Subscan.", 
+        "description": "The API key of the Subscan.",
         "required": false,
         "sensitive": false
       }
-    }}
+    }
+  }
 }

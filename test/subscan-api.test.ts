@@ -1,3 +1,4 @@
+// import { defineConfig } from 'vitest/config';
 /**
  * Copyright (c) 2025 weimeme
  * 
@@ -17,10 +18,12 @@
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
 import { SubscanApi } from '../src/common/subscan-api';
 import type { TransferDetail, TransferDetailWithMemo } from '../src/types';
+import config from "../vitest.config"
 
 describe('SubscanApi', () => {
     const mockNetwork = 'assethub-polkadot';
-    const SUBSCAN_API_KEY = '371616121bcc4d1b8f59d4e2072135e4';
+    let SUBSCAN_API_KEY = config?.test?.env?.SUBSCAN_API_KEY;
+    console.log("SUBSCAN_API_KEY", SUBSCAN_API_KEY);
     let api: SubscanApi;
 
     beforeEach(() => {

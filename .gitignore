@@ -5,3 +5,4 @@ dist/
 .vscode
 PUBLISHING.md
 coverage/
+vitest.env
