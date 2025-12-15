@@ -53,7 +53,6 @@ describe('SubstrateChain', () => {
             );
 
             expect(chain).toBeDefined();
-            // 区块高度大于0
             const blockHeight = await chain.getLatestBlockHeight();
             expect(blockHeight).toBeGreaterThan(0);
             expect(chain.api).toBeDefined();
@@ -64,12 +63,9 @@ describe('SubstrateChain', () => {
             // Verify chain properties are initialized
             const chainName = chain.getChainName();
             expect(chainName).toBe(mockNetwork);
-            // expect(typeof chainName).toBe('string');
             
             const ss58Format = chain.getSs58Format();
-            // console.log("ss58Format", JSON.stringify(ss58Format));
             expect(ss58Format).toBe(0);
-            // expect(typeof ss58Format).toBeTypeOf('number');
             
             // Cleanup
             // await chain.api.disconnect();
@@ -383,8 +379,7 @@ describe('SubstrateChain', () => {
         });
     });
 
-    describe.skip('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
-        // const subscan = "371616121bcc4d1b8f59d4e2072135e4";
+    describe('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
         const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
         it('should transfer DOT with memo', async () => {
             console.log("ALICE_PRIVATE_KEY", ALICE_PRIVATE_KEY);
@@ -411,11 +406,11 @@ describe('SubstrateChain', () => {
             console.log("txHash", txHash);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
             const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
-            expect(memo.memo).toBe("hello bob, i am alice, i am sending you a message");
+            expect(memo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
             console.log("memo", memo.memo);
             const bobMemo: TransferDetailWithMemo = await bobChain.getTransferMemo(txHash);
             console.log("bobMemo", JSON.stringify(bobMemo));
-            expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you a message");
+            expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
             const txHash2 = await aliceChain.transferWithMemo(bobAddress, BigInt(120000));
             console.log("txHash2", txHash2);
             await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
@@ -445,13 +440,13 @@ describe('SubstrateChain', () => {
             await expect(aliceChain.assetsTransferWithMemo("invalid-address-string", BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets")).rejects.toThrow();
             const txHash = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18, "hello bob, i am alice, i am sending you 18 assets");
             console.log("txHash", txHash);
-            await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
+            await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
             const memo: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash);
             console.log("memo", memo.memo);
             expect(memo.memo).toBe("hello bob, i am alice, i am sending you 18 assets");
             const txHash2 = await aliceChain.assetsTransferWithMemo(bobAddress, BigInt(100000), 18);
             console.log("txHash2", txHash2);
-            await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
+            await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
             expect(txHash2).toBeTruthy();
             const memo2: TransferDetailWithMemo = await aliceChain.getTransferMemo(txHash2);
             console.log("memo2", memo2);

@@ -65,8 +65,6 @@ describe('SubscanApi', () => {
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
             await expect(api.getMemoByTransferExtrinsics(["0xaw"])).rejects.toThrow();
-
-            // expect(result).toHaveLength(1);
             expect(result[0].extrinsic_index).toBe('9602102-2');
             expect(result[0].memo).toBe(mockMemo);
         }, );
@@ -90,7 +88,6 @@ describe('SubscanApi', () => {
 
             const result = await api.getMemoByTransferExtrinsics(mockExtrinsicIndices);
 
-            // expect(result).toHaveLength(1);
             expect(result[0].memo).toBeUndefined();
         }, );
 
