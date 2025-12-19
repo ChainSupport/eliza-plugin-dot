@@ -115,7 +115,7 @@ export const GET_MY_WALLET_INFO: Action = {
             // Convert balance from raw format to human-readable format
             const amount = (Number(balance) / 10 ** decimals).toString();
             const response = {
-                text: `My wallet address is ${address}, and my balance is ${amount.toString()}`,
+                text: `My wallet address: ${address} \n Native DOT balance: ${amount.toString()}`,
                 content: {address: address, balance: balance.toString()},
             } satisfies Content;
             if (callback) {

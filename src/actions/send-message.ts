@@ -190,7 +190,7 @@ export const SEND_MESSAGE: Action = {
         const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
         const txHash = await assethubService.chain.sendMessage(content.recipient, content.message);
         const response = {
-            text: `Send message '${content.message}' to ${content.recipient} successfully. txHash is ${txHash}`,
+            text: `Send message '${content.message}' to ${content.recipient} successfully. \nTx's id: ${txHash}`,
             content: {txHash: txHash, recipient: content.recipient, message: content.message},
         } satisfies Content;
         if (callback) {

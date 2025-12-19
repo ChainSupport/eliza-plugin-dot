@@ -106,13 +106,13 @@ export const MY_WALLET_HISTORY: Action = {
                 await assethubService.subscanApi.addressTransferHistory(myAddress),
                 assethubService.chain.cryptMessage
             );
-            
+            const sep = "----------------------------------------------------------";
             // Format history as readable text
             const historyText = history.map((item) => {
-                return `Type: ${item.type}, Sender: ${item.sender}, Recipient: ${item.recipient}, Token: ${item.tokenSymbol}, Amount: ${item.amount}, Memo: ${item.memo}, Timestamp: ${item.timestamp}, TxId: ${item.txId}`;
+                return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTimestamp: ${item.timestamp} \nTxId: ${item.txId} \n ${sep} `;
             }).join("\n");
             const response = {
-                text: `Get my wallet history on the POLKADOT AssetHub successfully. history: \n ${historyText}`,
+                text: `Get my wallet history on the POLKADOT AssetHub successfully. \nHistory: \n ${historyText}`,
                 content: {history},
             } satisfies Content;
             if (callback) {

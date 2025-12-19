@@ -246,9 +246,9 @@ export const USER_ASSETS_BALANCE: Action = {
             const address = content.address ?? await assethubService.chain.getMyAddress();
             const rawBalance = await assethubService.chain.getUserBalance(address, content.assetId);
             const balance = (Number(rawBalance) / (10 ** decimals)).toString();
-            const assetLabel = content.assetId == null ? "native DOT" : `asset ${content.assetId}`;
+            const assetLabel = content.assetId == null ? "Native DOT" : `Asset ${content.assetId}`;
             const response = {
-                text: `${content.address == null ? "Your" : content.address}'s ${assetLabel} Balance on the POLKADOT AssetHub is ${balance}`,
+                text: `${content.address == null ? "My" : content.address + "'s"} ${assetLabel} balance on the Polkadot AssetHub is ${balance}`,
                 content: {
                     balance: balance.toString(),
                     address: address,

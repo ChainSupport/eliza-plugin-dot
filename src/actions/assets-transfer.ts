@@ -287,7 +287,7 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
             txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, requiredAmount, content.assetId, content.memo);
         }
         const response = {
-            text: `Transfer ${content.assetId == null ? "DOT" : "asset " + content.assetId} to ${content.recipient} successfully, txHash is ${txHash}`,
+            text: `Transfer ${content.assetId == null ? "Native DOT" : "Asset " + content.assetId} to ${content.recipient} successfully. \nTx's id: ${txHash}`,
             content: {
                 txHash,
                 assetId: content.assetId == null ? "DOT" : content.assetId,

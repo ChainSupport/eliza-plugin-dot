@@ -191,10 +191,10 @@ export const GET_TRANSFER_DETAIL_BY_HASH: Action = {
             const transferDetail = transfersWithDecryptedMemo[0];
             
             // Format transfer detail as readable text
-            const detailText = `Type: ${transferDetail.type}, Sender: ${transferDetail.sender}, Recipient: ${transferDetail.recipient}, Token: ${transferDetail.tokenSymbol}, Amount: ${transferDetail.amount}, Fee: ${transferDetail.fee}, Memo: ${transferDetail.memo}, Timestamp: ${transferDetail.timestamp}, TxId: ${transferDetail.txId}`;
+            const detailText = `Type: ${transferDetail.type} \nSender: ${transferDetail.sender} \nRecipient: ${transferDetail.recipient} \nToken: ${transferDetail.tokenSymbol} \nAmount: ${transferDetail.amount} \nFee: ${transferDetail.fee} \nMemo: ${transferDetail.memo} \nTimestamp: ${transferDetail.timestamp} \nTxId: ${transferDetail.txId}`;
             
             const response = {
-                text: `Get transfer detail by hash on the POLKADOT AssetHub successfully. Detail: \n ${detailText}`,
+                text: `Get transfer detail by hash on the POLKADOT AssetHub successfully. \nDetail: \n ${detailText}`,
                 content: {transferDetail},
             } satisfies Content;
             if (callback) {
