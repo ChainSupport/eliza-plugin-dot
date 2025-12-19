@@ -37,6 +37,7 @@ import {
   } from '@elizaos/core';
 import {AssetHubService} from '../assethub-service';
 import { TransferDetailWithMemo } from '../types';
+import {formatTimestamp} from '../utils/timestamp';
 
 /**
  * Action definition for retrieving wallet transaction history on Polkadot Asset Hub.
@@ -109,7 +110,7 @@ export const MY_WALLET_HISTORY: Action = {
             const sep = "----------------------------------------------------------";
             // Format history as readable text
             const historyText = history.map((item) => {
-                return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTimestamp: ${item.timestamp} \nTxId: ${item.txId} \n ${sep} `;
+                return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTime: ${formatTimestamp(item.timestamp)} \nTxId: ${item.txId} \n ${sep} `;
             }).join("\n");
             const response = {
                 text: `Get my wallet history on the POLKADOT AssetHub successfully. \nHistory: \n \n \n${historyText}`,
