@@ -200,7 +200,7 @@ export const GET_TRANSFER_DETAIL_BY_HASH: Action = {
             if (callback) {
                 await callback(response);
             }
-            runtime.logger.info(`Get transfer detail by hash on the POLKADOT AssetHub successfully, detail: \n ${detailText}`);
+            runtime.logger.info(`Get transfer detail by hash on the Polkadot AssetHub successfully, detail: \n ${detailText}`);
             return {
                 success: true,
                 text: response.text,

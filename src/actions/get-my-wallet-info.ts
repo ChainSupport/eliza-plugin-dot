@@ -98,7 +98,7 @@ export const GET_MY_WALLET_INFO: Action = {
      */
     handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options: {[key: string]: unknown}, callback?: HandlerCallback) => {
         try {
-            runtime.logger.info("start to get my wallet info on the POLKADOT AssetHub");
+            runtime.logger.info("start to get my wallet info on the Polkadot AssetHub");
             
             // Get the AssetHubService instance
             const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
@@ -121,7 +121,7 @@ export const GET_MY_WALLET_INFO: Action = {
             if (callback) {
                 await callback(response);
             }
-            runtime.logger.info(`Get my wallet info on the POLKADOT AssetHub successfully, address: ${address}, balance: ${balance.toString()}`);
+            runtime.logger.info(`Get my wallet info on the Polkadot AssetHub successfully, address: ${address}, balance: ${balance.toString()}`);
             const result: ActionResult = {
                 success: true,
                 text: response.text,
@@ -135,7 +135,7 @@ export const GET_MY_WALLET_INFO: Action = {
             return result;
         } catch(e) {
             // Handle errors and notify via callback if available
-            const errorMessage = `Failed to get my wallet info on the POLKADOT AssetHub`;
+            const errorMessage = `Failed to get my wallet info on the Polkadot AssetHub`;
             runtime.logger.error(errorMessage);
             if (callback) {
                 await callback({

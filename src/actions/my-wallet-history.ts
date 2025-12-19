@@ -113,7 +113,7 @@ export const MY_WALLET_HISTORY: Action = {
                 return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTime: ${formatTimestamp(item.timestamp)} \nTxId: ${item.txId} \n ${sep} `;
             }).join("\n");
             const response = {
-                text: `Get my wallet history on the POLKADOT AssetHub successfully. \nHistory: \n \n \n${historyText}`,
+                text: `Get my wallet history on the Polkadot AssetHub successfully. \nHistory: \n \n \n${historyText}`,
                 content: {history},
             } satisfies Content;
             if (callback) {
