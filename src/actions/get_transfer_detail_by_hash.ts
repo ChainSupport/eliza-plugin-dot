@@ -191,7 +191,7 @@ export const GET_TRANSFER_DETAIL_BY_HASH: Action = {
             const transferDetail = transfersWithDecryptedMemo[0];
             
             // Format transfer detail as readable text
-            const detailText = `Type: ${transferDetail.type} \nSender: ${transferDetail.sender} \nRecipient: ${transferDetail.recipient} \nToken: ${transferDetail.tokenSymbol} \nAmount: ${transferDetail.amount} \nFee: ${transferDetail.fee} \nMemo: ${transferDetail.memo} \nTimestamp: ${transferDetail.timestamp} \nTxId: ${transferDetail.txId}`;
+            const detailText = `Sender: ${transferDetail.sender} \nRecipient: ${transferDetail.recipient} \nToken: ${transferDetail.tokenSymbol} \nAmount: ${transferDetail.amount} \nFee: ${transferDetail.fee} \nMemo: ${transferDetail.memo} \nTimestamp: ${transferDetail.timestamp} \nTxId: ${transferDetail.txId}`;
             
             const response = {
                 text: `Get transfer detail by hash on the POLKADOT AssetHub successfully. \nDetail: \n ${detailText}`,
