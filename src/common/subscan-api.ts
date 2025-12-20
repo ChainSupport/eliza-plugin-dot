@@ -136,7 +136,10 @@ export class SubscanApi {
             };
 
             const response = await fetch(url, options);
-            const data = await response.json();
+                const data = await response.json();
+                if (data == null || (data as any).data == null || (data as any).data.transfers == null || (data as any).data.transfers.length == 0) {
+                return [];
+            }
             const memos = await this.getMemoByTransferExtrinsics((data as any).data.transfers.map((item: any) => item.extrinsic_index));
             const transfers = (data as any).data.transfers.map((item: any) => {
             
