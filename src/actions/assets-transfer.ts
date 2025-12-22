@@ -286,8 +286,9 @@ handler: async (runtime: IAgentRuntime, message: Memory, state: State, _options:
             // Transfer asset (token)
             txHash = await assethubService.chain.assetsTransferWithMemo(content.recipient, requiredAmount, content.assetId, content.memo);
         }
+        const extrinsic_url = `https://${assethubService.subscanApi.network}.subscan.io/extrinsic/${txHash}`;
         const response = {
-            text: `Transfer ${content.assetId == null ? "Native DOT" : "Asset " + content.assetId} to ${content.recipient} successfully. \nTx's id: ${txHash}`,
+            text: `Transfer ${content.assetId == null ? "Native DOT" : "Asset " + content.assetId} to ${content.recipient} successfully. \nTx's id: ${txHash} \nExtrinsic URL: ${extrinsic_url}`,
             content: {
                 txHash,
                 assetId: content.assetId == null ? "DOT" : content.assetId,

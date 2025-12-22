@@ -107,10 +107,11 @@ export const MY_WALLET_HISTORY: Action = {
                 await assethubService.subscanApi.addressTransferHistory(myAddress),
                 assethubService.chain.cryptMessage
             );
+            const extrinsic_url = `https://${assethubService.subscanApi.network}.subscan.io/extrinsic/`;
             const sep = "----------------------------------------------------------";
             // Format history as readable text
             const historyText = history.map((item) => {
-                return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTime: ${formatTimestamp(item.timestamp)} \nTxId: ${item.txId} \n ${sep} `;
+                return `Type: ${item.type} \nSender: ${item.sender} \nRecipient: ${item.recipient} \nToken: ${item.tokenSymbol} \nAmount: ${item.amount} \nMemo: ${item.memo} \nTime: ${formatTimestamp(item.timestamp)} \nTxId: ${item.txId} \n Extrinsic URL: ${extrinsic_url}${item.extrinsic_index} \n ${sep} `;
             }).join("\n");
             const response = {
                 text: `Get my wallet history on the Polkadot AssetHub successfully. \nHistory: \n \n \n${historyText}`,

@@ -189,8 +189,9 @@ export const SEND_MESSAGE: Action = {
         // Get the AssetHubService instance and send the encrypted message
         const assethubService: AssetHubService = runtime.getService(AssetHubService.serviceType);
         const txHash = await assethubService.chain.sendMessage(content.recipient, content.message);
+        const extrinsic_url = `https://${assethubService.subscanApi.network}.subscan.io/extrinsic/${txHash}`;
         const response = {
-            text: `Send message '${content.message}' to ${content.recipient} successfully. \nTx's id: ${txHash}`,
+            text: `Send message '${content.message}' to ${content.recipient} successfully. \nTx's id: ${txHash} \nExtrinsic URL: ${extrinsic_url}`,
             content: {txHash: txHash, recipient: content.recipient, message: content.message},
         } satisfies Content;
         if (callback) {
