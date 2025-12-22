@@ -191,7 +191,7 @@ export const GET_TRANSFER_DETAIL_BY_HASH: Action = {
             const transferDetail = transfersWithDecryptedMemo[0];
              const extrinsic_url = `https://${assethubService.subscanApi.network}.subscan.io/extrinsic/${transferDetail.extrinsic_index}`;
             // Format transfer detail as readable text
-            const detailText = `Sender: ${transferDetail.sender} \nRecipient: ${transferDetail.recipient} \nToken: ${transferDetail.tokenSymbol} \nAmount: ${transferDetail.amount} \nFee: ${transferDetail.fee} \nMemo: ${transferDetail.memo} \nTime: ${formatTimestamp(transferDetail.timestamp)} \nTxId: ${transferDetail.txId} \nExtrinsic URL: ${extrinsic_url}`;
+            const detailText = `Sender: ${transferDetail.sender} \nRecipient: ${transferDetail.recipient} \nToken: ${transferDetail.tokenSymbol} \nAmount: ${transferDetail.amount} \nFee: ${transferDetail.fee} \nMemo: ${transferDetail.memo ?? ""} \nTime: ${formatTimestamp(transferDetail.timestamp)} \nTxId: ${transferDetail.txId} \nExtrinsic URL: ${extrinsic_url}`;
             
             const response = {
                 text: `Get transfer detail by hash on the POLKADOT AssetHub successfully. \nDetail: \n ${detailText}`,
