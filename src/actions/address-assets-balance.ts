@@ -247,8 +247,9 @@ export const USER_ASSETS_BALANCE: Action = {
             const rawBalance = await assethubService.chain.getUserBalance(address, content.assetId);
             const balance = (Number(rawBalance) / (10 ** decimals)).toString();
             const assetLabel = content.assetId == null ? "Native DOT" : `Asset ${content.assetId}`;
+            const accountUrl = `https://${assethubService.subscanApi.network}.subscan.io/account/${address}`;
             const response = {
-                text: `${content.address == null ? "My" : content.address + "'s"} ${assetLabel} balance on the Polkadot AssetHub is ${balance}`,
+                text: `${content.address == null ? "My" : content.address + "'s"} ${assetLabel} balance on the Polkadot AssetHub is ${balance} \nAccount URL: ${accountUrl}`,
                 content: {
                     balance: balance.toString(),
                     address: address,

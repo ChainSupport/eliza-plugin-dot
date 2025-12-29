@@ -114,8 +114,9 @@ export const GET_MY_WALLET_INFO: Action = {
             
             // Convert balance from raw format to human-readable format
             const amount = (Number(balance) / 10 ** decimals).toString();
+            const accountUrl = `https://${assethubService.subscanApi.network}.subscan.io/account/${address}`;
             const response = {
-                text: `My wallet address: ${address} \n Native DOT balance: ${amount.toString()}`,
+                text: `My wallet address: ${address} \n Native DOT balance: ${amount.toString()} \nAccount URL: ${accountUrl}`,
                 content: {address: address, balance: balance.toString()},
             } satisfies Content;
             if (callback) {
