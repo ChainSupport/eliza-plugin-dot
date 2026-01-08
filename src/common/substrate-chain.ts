@@ -373,7 +373,7 @@ export class SubstrateChain {
                 throw new Error("to is not a valid address");
             }
             const wsApi = new ApiPromise({provider: new WsProvider(this.rpcUrl.replace("https", "wss"))});
-            await wsApi.isReady;
+            await wsApi.isReady
             const keyPair = await this.getMyKeyPair();
             
             return new Promise<string>((resolve, reject) => {
@@ -391,10 +391,12 @@ export class SubstrateChain {
                             } else {
                                 errorInfo = result.dispatchError.toString();
                             }
+                            wsApi.disconnect().catch(console.error);
                             reject(new Error(`Transaction failed: ${errorInfo}`));
                             return;
                         }
                         console.log(`Transaction ${txHash} is finalized`);
+                        wsApi.disconnect().catch(console.error);
                         // Transaction finalized successfully
                         resolve(txHash.toString());
                     } else {
@@ -403,19 +405,24 @@ export class SubstrateChain {
                         // The callback will be called again on the next status change
                     }
                 };
+                // Handle errors that occur before signAndSend
+                const handleError = (error: any) => {
+                    wsApi.disconnect().catch(console.error);
+                    reject(error);
+                };
                 
                 if (memo == null) {
                     wsApi.tx.balances.transferKeepAlive(to, amount)
                         .signAndSend(keyPair, handleResult)
-                        .catch(reject);
+                        .catch(handleError);
                 } else {
                     this.encryptMemo(memo, to, null).then((m: EncryptedMemo) => {
                         const transfer = wsApi.tx.balances.transferKeepAlive(to, amount);
                         const remark = wsApi.tx.system.remark(JSON.stringify(m));
                         wsApi.tx.utility.batchAll([transfer, remark])
                             .signAndSend(keyPair, handleResult)
-                            .catch(reject);
-                    }).catch(reject);
+                            .catch(handleError);
+                    }).catch(handleError);
                 }
             });
         } catch (e) {
@@ -484,10 +491,13 @@ export class SubstrateChain {
                             } else {
                                 errorInfo = result.dispatchError.toString();
                             }
+                            wsApi.disconnect().catch(console.error);
                             reject(new Error(`Transaction failed: ${errorInfo}`));
+
                             return;
                         }
                         console.log(`Transaction ${txHash} is finalized`);
+                        wsApi.disconnect().catch(console.error);
                         // Transaction finalized successfully
                         resolve(txHash.toString());
                     } else {
@@ -496,19 +506,24 @@ export class SubstrateChain {
                         // The callback will be called again on the next status change
                     }
                 };
-                
+                // Handle errors that occur before signAndSend
+                const handleError = (error: any) => {
+                    wsApi.disconnect().catch(console.error);
+                    reject(error);
+                };
+
                 if (memo == null) {
                     wsApi.tx.assets.transferKeepAlive(assetId, to, amount)
                         .signAndSend(keyPair, handleResult)
-                        .catch(reject);
+                        .catch(handleError);
                 } else {
                     this.encryptMemo(memo, to, null).then((m: EncryptedMemo) => {
                         const transfer = wsApi.tx.assets.transferKeepAlive(assetId, to, amount);
                         const remark = wsApi.tx.system.remark(JSON.stringify(m));
                         wsApi.tx.utility.batchAll([transfer, remark])
                             .signAndSend(keyPair, handleResult)
-                            .catch(reject);
-                    }).catch(reject);
+                            .catch(handleError);
+                    }).catch(handleError);
                 }
             });
         } catch (e) {
