@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ApiPromise, HttpProvider, Keyring } from "@polkadot/api";
+import { ApiPromise, HttpProvider, Keyring, WsProvider } from "@polkadot/api";
 import { checkAddress} from "@polkadot/util-crypto";
 import { hexToU8a, u8aToHex } from "@polkadot/util";
 import { KeyringPair } from "@polkadot/keyring/types";
@@ -83,7 +83,7 @@ export class SubstrateChain {
      */
     private async init() {
         try {
-            const provider = new HttpProvider(this.rpcUrl);
+            const provider = new WsProvider(this.rpcUrl);
             this.api = await ApiPromise.create({ provider });
             const chain = await this.api.rpc.system.chain();
             const properties = await this.api.rpc.system.properties();
@@ -373,13 +373,34 @@ export class SubstrateChain {
             throw new Error("to is not a valid address");
         }
         if (memo == null) {
-            const tx = await this.api.tx.balances.transferKeepAlive(to, amount).signAndSend(await this.getMyKeyPair());
+            const tx = await this.api.tx.balances.transferKeepAlive(to, amount).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
+                console.log(`Current status is ${JSON.stringify(status)}`)
+                if (status !== undefined && status.isFinalized) {
+                    console.log(`Transaction ${txHash} is finalized`);
+                    tx();
+                } else {
+                    console.log(`Transaction ${txHash} is not finalized`)
+                    // tx();
+                }
+            });
             return tx.toString();
         }
         const m: EncryptedMemo = await this.encryptMemo(memo, to, null);
         const transfer = this.api.tx.balances.transferKeepAlive(to, amount);
         const remark = this.api.tx.system.remark(JSON.stringify(m));
-        const tx = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair());
+        // use callback to get the status of the transaction, until it is finalized
+        const tx = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair(), 
+        ({status, txHash}) => {
+            console.log(`Current status is ${JSON.stringify(status)}`)
+            if (status !== undefined && status.isFinalized) {
+                console.log(`Transaction ${txHash} is finalized`);
+                tx();
+            } else {
+                console.log(`Transaction ${txHash} is not finalized`)
+                // tx();
+            }
+        }
+    );
         return tx.toString();
         } catch (e) {
             throw Error(`Failed to transferWithMemo: ${e}`);
@@ -434,14 +455,32 @@ export class SubstrateChain {
                 throw new Error("to is not a valid address");
             }
             if (memo == null) {
-                const tx = await this.api.tx.assets.transferKeepAlive(assetId, to, amount).signAndSend(await this.getMyKeyPair());
+                const tx = await this.api.tx.assets.transferKeepAlive(assetId, to, amount).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
+                    console.log(`Current status is ${JSON.stringify(status)}`)
+                    if (status !== undefined && status.isFinalized) {
+                        console.log(`Transaction ${txHash} is finalized`);
+                        tx();
+                    } else {
+                        console.log(`Transaction ${txHash} is not finalized`)
+                        // tx();
+                    }
+                });
                 return tx.toString();
             }
             const m: EncryptedMemo = await this.encryptMemo(memo, to, null);
             const transfer = this.api.tx.assets.transferKeepAlive(assetId, to, amount);
             const remark = this.api.tx.system.remark(JSON.stringify(m));
-            const txHash = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair());
-            return txHash.toString();
+            const tx = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
+                console.log(`Current status is ${JSON.stringify(status)}`)
+                if (status !== undefined && status.isFinalized) {
+                    console.log(`Transaction ${txHash} is finalized`);
+                    tx();
+                } else {
+                    console.log(`Transaction ${txHash} is not finalized`)
+                    // tx();
+                }
+            });
+            return tx.toString();
         } catch (e) {
             throw Error(`Failed to assetsTransferWithMemo: ${e}`);
         }

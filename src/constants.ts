@@ -20,5 +20,5 @@
 
 
 // export const DEFAULT_ASSET_HUB_WALLET_DATA_KEY = "asset_hub_polkadot/walletData"
-export const DEFAULT_ASSET_HUB_RPC_URL = "https://rpc-asset-hub-polkadot.luckyfriday.io"
+export const DEFAULT_ASSET_HUB_RPC_URL = "wss://rpc-asset-hub-polkadot.luckyfriday.io"
 export const DEFAULT_SUBSCAN_X_API_KEY = "371616121bcc4d1b8f59d4e2072135e4"
