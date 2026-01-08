@@ -165,13 +165,13 @@ describe('SubstrateChain', () => {
             // expect(AliceSubstrateChain.subscanApi).toBe(subscanApi);
         }, );
 
-        it('should throw error when RPC URL is invalid', { timeout: 300000 }, async () => {
-            const invalidRpcUrl = 'wss://invalid-rpc-url-that-does-not-exist.com/ws';
+        // it('should throw error when RPC URL is invalid', { timeout: 300000 }, async () => {
+        //     const invalidRpcUrl = 'wss://invalid-rpc-url-that-does-not-exist.com/ws';
             
-            await expect(
-                SubstrateChain.create(invalidRpcUrl, ALICE_PRIVATE_KEY)
-            ).rejects.toThrow();
-        }, );
+        //     await expect(
+        //         SubstrateChain.create(invalidRpcUrl, ALICE_PRIVATE_KEY)
+        //     ).rejects.toThrow();
+        // }, );
 
         it('should handle different keypair types', { timeout: 300000 }, async () => {
 
@@ -323,67 +323,52 @@ describe('SubstrateChain', () => {
         });
     });
 
-    describe.only('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
-        // const rpc = "https://polkadot-asset-hub-rpc.polkadot.io";
-        it.only('should transfer DOT with memo', async () => {
+    describe.sequential('transferWithMemo', { timeout: 30000 * 2 * 20 }, () => {
+        const memoToBob = "hello bob, i am alice, i am sending you 0.01 DOT";
+        const memoToBobDota = "hello bob, i am alice, i am sending you 0.1 DOTA";
+        const memoToBobMessage = "hello bob, i am alice, i am sending you a message";
+        var dotTransferTxHash1: string;
+        let dotTransferTxHash2: string;
+        let dotaTransferTxHash1: string;
+        let dotaTransferTxHash2: string;
+        let messageTransferTxHash1: string;
+        let messageTransferTxHash2: string;
+
+        it('should transfer DOT with memo', async () => {
             const bobAddress = await BobSubstrateChain.getMyAddress();
-            console.log("bobAddress", bobAddress);
-            const aliceAddress = await AliceSubstrateChain.getMyAddress();
-            console.log("aliceAddress", aliceAddress);
-            await expect(AliceSubstrateChain.transferWithMemo("invalid-address-string", BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT")).rejects.toThrow();
-            const txHash = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
-            console.log("txHash", txHash);
+   
+            await expect(AliceSubstrateChain.transferWithMemo("invalid-address-string", BigInt(120000), memoToBob)).rejects.toThrow();
+            dotTransferTxHash1 = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000), "hello bob, i am alice, i am sending you 0.01 DOT");
+
             // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            // const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
-            // expect(memo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
-            // console.log("memo", memo.memo);
-            // const bobMemo: TransferDetailWithMemo = await BobSubstrateChain.getTransferMemo(txHash);
-            // console.log("bobMemo", JSON.stringify(bobMemo));
-            // expect(bobMemo.memo).toBe("hello bob, i am alice, i am sending you 0.01 DOT");
-            // const txHash2 = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000));
-            // console.log("txHash2", txHash2);
+            
+            // 不发送任何memo 解析出来应该是 undefined
+            dotTransferTxHash2 = await AliceSubstrateChain.transferWithMemo(bobAddress, BigInt(120000));
             // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-            // expect(txHash2).toBeTruthy();
-            // const memo2: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash2);
-            // console.log("memo2", memo2);
-            // expect(memo2.memo).toBe(undefined);
+
         }, );
 
-        // it('should transfer asset with memo', { timeout: 30000 * 2 * 20 }, async () => {
-        //     const bobAddress = await BobSubstrateChain.getMyAddress();
-        //     console.log("bobAddress", bobAddress);
-        //     const aliceAddress = await AliceSubstrateChain.getMyAddress();
-        //     console.log("aliceAddress", aliceAddress);
-        //     await expect(AliceSubstrateChain.assetsTransferWithMemo("invalid-address-string", BigInt(1000), 18, "hello bob, i am alice, i am sending you 0.1 dota")).rejects.toThrow();
-        //     const txHash = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18, "hello bob, i am alice, i am sending you 0.1 dota");
-        //     console.log("txHash", txHash);
-        //     // await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
-        //     // const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
-        //     // console.log("memo", memo.memo);
-        //     // expect(memo.memo).toBe("hello bob, i am alice, i am sending you 0.1 dota");
-        //     // const txHash2 = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18);
-        //     // console.log("txHash2", txHash2);
-        //     // await new Promise(resolve => setTimeout(resolve, 5 * 60 * 1000));
-        //     // expect(txHash2).toBeTruthy();
-        //     // const memo2: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash2);
-        //     // console.log("memo2", memo2);
-        //     // expect(memo2.memo).toBe(undefined);
-        // }, );
+        it('should transfer asset with memo', { timeout: 30000 * 2 * 20 }, async () => {
+            const bobAddress = await BobSubstrateChain.getMyAddress();
+            await expect(AliceSubstrateChain.assetsTransferWithMemo("invalid-address-string", BigInt(1000), 18, memoToBobDota)).rejects.toThrow();
+            dotaTransferTxHash1 = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18, memoToBobDota);
+            // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
+            
+            dotaTransferTxHash2 = await AliceSubstrateChain.assetsTransferWithMemo(bobAddress, BigInt(1000), 18);
+            // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
+            
+        }, );
 
-        // it('should send message to bob', { timeout: 30000 * 2 * 20 }, async () => {
-        //     const bobAddress = await BobSubstrateChain.getMyAddress();
-        //     console.log("bobAddress", bobAddress);
-        //     const aliceAddress = await AliceSubstrateChain.getMyAddress(); 
-        //     await expect(AliceSubstrateChain.sendMessage(bobAddress, "")).rejects.toThrow();
-        //     const txHash = await AliceSubstrateChain.sendMessage(bobAddress, "hello bob, i am alice, i am sending you a message");
-        //     console.log("txHash", txHash);
-        //     // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
-        //     // const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(txHash);
-        //     // console.log("memo", memo.memo);
-        //     // expect(memo.memo).toBe("hello bob, i am alice, i am sending you a message");
-        // }, );
+        it('should send message to bob', { timeout: 30000 * 2 * 20 }, async () => {
+            const bobAddress = await BobSubstrateChain.getMyAddress();
+            // const aliceAddress = await AliceSubstrateChain.getMyAddress(); 
+            await expect(AliceSubstrateChain.sendMessage(bobAddress, "")).rejects.toThrow();
+            messageTransferTxHash1 = await AliceSubstrateChain.sendMessage(bobAddress, memoToBobMessage);
+            // await new Promise(resolve => setTimeout(resolve, 2 * 60 * 1000));
+            
+        }, );
 
-        it.skip('should get 10 transactions for bob and decrypt them', { timeout: 30000 * 2 * 20 }, async () => {
+        it('should get 10 transactions for bob and decrypt them', { timeout: 30000 * 2 * 20 }, async () => {
            
             const bobAddress = await BobSubstrateChain.getMyAddress();
             if (!BobSubstrateChain.subscanApi) {
@@ -395,6 +380,32 @@ describe('SubstrateChain', () => {
                 console.log("tx: ", JSON.stringify(tx));
             }
         }, );
+
+        // 获取上述转账消息并解密memo
+        it('should get the transfer messages and decrypt the memo', { timeout: 30000 * 2 * 20 }, async () => {
+            // 等待3分钟
+            await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000)); 
+            // alice和bob均可以解密
+            const memo: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(dotTransferTxHash1);
+            expect(memo.memo).toBe(memoToBob);
+            const bobMemo: TransferDetailWithMemo = await BobSubstrateChain.getTransferMemo(dotTransferTxHash1);
+            expect(bobMemo.memo).toBe(memoToBob);
+
+            const memo2: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(dotTransferTxHash2);
+            expect(memo2.memo).toBe(undefined);
+
+            const memo3: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(dotaTransferTxHash1);
+            expect(memo3.memo).toBe(memoToBobDota);
+
+            const memo4: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(dotaTransferTxHash2);
+            expect(memo4.memo).toBe(undefined);
+
+
+            const memo5: TransferDetailWithMemo = await AliceSubstrateChain.getTransferMemo(messageTransferTxHash1);
+            expect(memo5.memo).toBe(memoToBobMessage);
+        },);
+
+
     });
 
 

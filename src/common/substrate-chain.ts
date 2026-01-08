@@ -83,7 +83,7 @@ export class SubstrateChain {
      */
     private async init() {
         try {
-            const provider = new WsProvider(this.rpcUrl);
+            const provider = new HttpProvider(this.rpcUrl);
             this.api = await ApiPromise.create({ provider });
             const chain = await this.api.rpc.system.chain();
             const properties = await this.api.rpc.system.properties();
@@ -369,43 +369,58 @@ export class SubstrateChain {
      */
     public async transferWithMemo(to: string, amount: bigint, memo: string | null = null): Promise<string> {
         try {
-        if (!this.validateAddress(to)) {
-            throw new Error("to is not a valid address");
-        }
-        if (memo == null) {
-            const tx = await this.api.tx.balances.transferKeepAlive(to, amount).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
-                console.log(`Current status is ${JSON.stringify(status)}`)
-                if (status !== undefined && status.isFinalized) {
-                    console.log(`Transaction ${txHash} is finalized`);
-                    tx();
+            if (!this.validateAddress(to)) {
+                throw new Error("to is not a valid address");
+            }
+            const wsApi = new ApiPromise({provider: new WsProvider(this.rpcUrl.replace("https", "wss"))});
+            await wsApi.isReady;
+            const keyPair = await this.getMyKeyPair();
+            
+            return new Promise<string>((resolve, reject) => {
+                const handleResult = (result: any) => {
+                    const { status, txHash } = result;
+                    console.log(`Current status is ${JSON.stringify(status)}`);
+                    
+                    if (status !== undefined && status.isFinalized) {
+                        // Check for dispatch errors
+                        if (result.dispatchError) {
+                            let errorInfo: string;
+                            if (result.dispatchError.isModule) {
+                                const decoded = wsApi.registry.findMetaError(result.dispatchError.asModule);
+                                errorInfo = `${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`;
+                            } else {
+                                errorInfo = result.dispatchError.toString();
+                            }
+                            reject(new Error(`Transaction failed: ${errorInfo}`));
+                            return;
+                        }
+                        console.log(`Transaction ${txHash} is finalized`);
+                        // Transaction finalized successfully
+                        resolve(txHash.toString());
+                    } else {
+                        console.log(`Transaction ${txHash} is not finalized`);
+                        // If status is not Finalized, the subscription continues listening
+                        // The callback will be called again on the next status change
+                    }
+                };
+                
+                if (memo == null) {
+                    wsApi.tx.balances.transferKeepAlive(to, amount)
+                        .signAndSend(keyPair, handleResult)
+                        .catch(reject);
                 } else {
-                    console.log(`Transaction ${txHash} is not finalized`)
-                    // tx();
+                    this.encryptMemo(memo, to, null).then((m: EncryptedMemo) => {
+                        const transfer = wsApi.tx.balances.transferKeepAlive(to, amount);
+                        const remark = wsApi.tx.system.remark(JSON.stringify(m));
+                        wsApi.tx.utility.batchAll([transfer, remark])
+                            .signAndSend(keyPair, handleResult)
+                            .catch(reject);
+                    }).catch(reject);
                 }
             });
-            return tx.toString();
-        }
-        const m: EncryptedMemo = await this.encryptMemo(memo, to, null);
-        const transfer = this.api.tx.balances.transferKeepAlive(to, amount);
-        const remark = this.api.tx.system.remark(JSON.stringify(m));
-        // use callback to get the status of the transaction, until it is finalized
-        const tx = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair(), 
-        ({status, txHash}) => {
-            console.log(`Current status is ${JSON.stringify(status)}`)
-            if (status !== undefined && status.isFinalized) {
-                console.log(`Transaction ${txHash} is finalized`);
-                tx();
-            } else {
-                console.log(`Transaction ${txHash} is not finalized`)
-                // tx();
-            }
-        }
-    );
-        return tx.toString();
         } catch (e) {
             throw Error(`Failed to transferWithMemo: ${e}`);
         }
-
     }
 
 
@@ -448,39 +463,54 @@ export class SubstrateChain {
             if (assetId == null) {
                 return await this.transferWithMemo(to, amount, memo);
             }
-            // if (amount == 0) {
-            //     throw new Error("amount must be greater than 0");
-            // }
             if (!this.validateAddress(to)) {
                 throw new Error("to is not a valid address");
             }
-            if (memo == null) {
-                const tx = await this.api.tx.assets.transferKeepAlive(assetId, to, amount).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
-                    console.log(`Current status is ${JSON.stringify(status)}`)
+            const wsApi = new ApiPromise({provider: new WsProvider(this.rpcUrl.replace("https", "wss"))});
+            const keyPair = await this.getMyKeyPair();
+            await wsApi.isReady;
+            return new Promise<string>((resolve, reject) => {
+                const handleResult = (result: any) => {
+                    const { status, txHash } = result;
+                    console.log(`Current status is ${JSON.stringify(status)}`);
+                    
                     if (status !== undefined && status.isFinalized) {
+                        // Check for dispatch errors
+                        if (result.dispatchError) {
+                            let errorInfo: string;
+                            if (result.dispatchError.isModule) {
+                                const decoded = wsApi.registry.findMetaError(result.dispatchError.asModule);
+                                errorInfo = `${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`;
+                            } else {
+                                errorInfo = result.dispatchError.toString();
+                            }
+                            reject(new Error(`Transaction failed: ${errorInfo}`));
+                            return;
+                        }
                         console.log(`Transaction ${txHash} is finalized`);
-                        tx();
+                        // Transaction finalized successfully
+                        resolve(txHash.toString());
                     } else {
-                        console.log(`Transaction ${txHash} is not finalized`)
-                        // tx();
+                        console.log(`Transaction ${txHash} is not finalized`);
+                        // If status is not Finalized, the subscription continues listening
+                        // The callback will be called again on the next status change
                     }
-                });
-                return tx.toString();
-            }
-            const m: EncryptedMemo = await this.encryptMemo(memo, to, null);
-            const transfer = this.api.tx.assets.transferKeepAlive(assetId, to, amount);
-            const remark = this.api.tx.system.remark(JSON.stringify(m));
-            const tx = await this.api.tx.utility.batchAll([transfer, remark]).signAndSend(await this.getMyKeyPair(), ({status, txHash}) => {
-                console.log(`Current status is ${JSON.stringify(status)}`)
-                if (status !== undefined && status.isFinalized) {
-                    console.log(`Transaction ${txHash} is finalized`);
-                    tx();
+                };
+                
+                if (memo == null) {
+                    wsApi.tx.assets.transferKeepAlive(assetId, to, amount)
+                        .signAndSend(keyPair, handleResult)
+                        .catch(reject);
                 } else {
-                    console.log(`Transaction ${txHash} is not finalized`)
-                    // tx();
+                    this.encryptMemo(memo, to, null).then((m: EncryptedMemo) => {
+                        const transfer = wsApi.tx.assets.transferKeepAlive(assetId, to, amount);
+                        const remark = wsApi.tx.system.remark(JSON.stringify(m));
+                        wsApi.tx.utility.batchAll([transfer, remark])
+                            .signAndSend(keyPair, handleResult)
+                            .catch(reject);
+                    }).catch(reject);
                 }
             });
-            return tx.toString();
         } catch (e) {
             throw Error(`Failed to assetsTransferWithMemo: ${e}`);
         }
