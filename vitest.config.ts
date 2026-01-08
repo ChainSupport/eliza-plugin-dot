@@ -19,5 +19,6 @@ export default defineConfig({
             BOB_PRIVATE_KEY: process.env.BOB_PRIVATE_KEY || '',
             SUBSCAN_API_KEY: process.env.SUBSCAN_API_KEY || DEFAULT_SUBSCAN_X_API_KEY,
         },
+        hookTimeout: 300000, // 5 minutes
     },
 });
